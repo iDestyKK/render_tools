@@ -167,7 +167,6 @@ fi
 
 __chk "${UTIL}/ffmpeg.exe"
 __chk "${UTIL}/gen_json.sh"
-__chk "${UTIL}/agrep.exe"
 __chk "settings.dat"
 __chk "queue"
 __chk "processed"
@@ -223,6 +222,7 @@ printf "  %-32s " "Multitrack Audio Detection"
 printf "[ ${green}%-11s${normal} ]" "on"
 printf " [ %-11s ]\n" "on"
 
+printf "\n"
 
 # -----------------------------------------------------------------------------
 # 5. Batch Rendering (NEW)                                                 {{{1
@@ -250,7 +250,12 @@ while IFS= read -r line; do
 	cd "${SPATH}/${folder}"
 
 	# Go through every AVI and process
-	for F in $(find *.avi -type f -print 2> /dev/null | xargs -r0 echo); do
+
+	# for F in $(find *.avi -type f -print 2> /dev/null | xargs -r0 echo); do
+
+	# Fucking cheat. I'm tired.
+	IFS=$'\n'
+	for F in $(ls -1 *".avi" 2> /dev/null); do
 		# Skip the file if it already exists in the "processed" directory
 		if [ ! -e "${SPATH}/processed/${F/avi/mkv}" ]; then
 			printf \
@@ -258,6 +263,7 @@ while IFS= read -r line; do
 				"$(gettime)" \
 				"$F"
 
+			# STEP 1: Get Audio Amplification (if enabled)
 			printf \
 				"[%s]     [AUDIO] Volume amp: " \
 				"$(gettime)"
@@ -274,12 +280,73 @@ while IFS= read -r line; do
 					2> "audio_info.dat"
 
 				# Set Amplification accordingly
-				AMPLIFY_AMT=$(${SPATH}/agrep.exe audio_info.dat)
+				AMPLIFY_AMT=$(cat audio_info.dat \
+					| grep "max_volume" \
+					| sed 's/.*-\(.*\) dB/\1/'
+				)
+
+				# Clean up
+				rm audio_info.dat
 			fi
 
 			printf "%sdB\n" "$AMPLIFY_AMT"
 
+			# STEP 2: Begin rendering video
+			printf \
+				"[%s]     [VIDEO] Rendering via ffmpeg (%s %s w/ %s):\n" \
+				"$(gettime)" \
+				"$value" "$mode" \
+				"$acodec"
 
+			if [ "$mode" == "cbr" ]; then
+				# We are encoding with a bitrate
+				${ffmpeg} \
+					-hide_banner                              \
+					-v              quiet                     \
+					-stats                                    \
+					-y                                        \
+					-i              "$F"                      \
+					-map            0:0                       \
+					-map            0:1                       \
+					-strict         -2                        \
+					-vcodec         ${CODEC}                  \
+					-pix_fmt        ${PIX_FMT}                \
+					-vf             fps=60                    \
+					-af             "volume=${AMPLIFY_AMT}dB" \
+					-b:v            $value                    \
+					-maxrate        $value                    \
+					-bufsize        $value                    \
+					-preset         $preset                   \
+					-c:a            $acodec                   \
+					-x265-params    log-level=error           \
+					-metadata:s:a:0 title="Game Audio"        \
+					"${SPATH}/processed/${F/avi/mkv}"
+			elif [ "$mode" == "crf" ]; then
+				# We are encoding with variable bitrate
+				${ffmpeg} \
+					-hide_banner                              \
+					-v              quiet                     \
+					-stats                                    \
+					-y                                        \
+					-i              "$F"                      \
+					-map            0:0                       \
+					-map            0:1                       \
+					-strict         -2                        \
+					-vcodec         ${CODEC}                  \
+					-pix_fmt        ${PIX_FMT}                \
+					-vf             fps=60                    \
+					-af             "volume=${AMPLIFY_AMT}dB" \
+					-crf            $value                    \
+					-preset         $preset                   \
+					-c:a            $acodec                   \
+					-x265-params    log-level=error           \
+					-metadata:s:a:0 title="Game Audio"        \
+					"${SPATH}/processed/${F/avi/mkv}"
+			fi
+
+			printf \
+				"[%s] Render Job Done!\n" \
+				"$(gettime)"
 		fi
 	done
 
