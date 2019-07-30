@@ -179,6 +179,8 @@ __chk "queue/bluray"
 # 4. Overview                                                              {{{1
 # -----------------------------------------------------------------------------
 
+# TODO: Clean up (Oh god...)
+
 printf "\nBATCH RENDERING CONFIGURATION:\n"
 
 # Tell the user what the script is configured to do
@@ -222,6 +224,11 @@ printf "  %-32s " "Multitrack Audio Detection"
 printf "[ ${green}%-11s${normal} ]" "on"
 printf " [ %-11s ]\n" "on"
 
+# Container Format
+printf "  %-32s " "Container Format"
+printf "[ ${green}%-11s${normal} ]" "mkv"
+printf " [ %-11s ]\n" "mkv"
+
 printf "\n"
 
 # -----------------------------------------------------------------------------
@@ -229,7 +236,7 @@ printf "\n"
 # -----------------------------------------------------------------------------
 
 function gettime {
-	printf $(date +%Y-%m-%d-%H:%M:%S)
+	printf $(date +%Y-%m-%d\ -\ %H:%M:%S)
 }
 
 while IFS= read -r line; do
@@ -265,7 +272,7 @@ while IFS= read -r line; do
 
 			# STEP 1: Get Audio Amplification (if enabled)
 			printf \
-				"[%s]     [AUDIO] Volume amp: " \
+				"[%s]     [${green}AUDIO${normal}] Volume amp: " \
 				"$(gettime)"
 
 			AMPLIFY_AMT="0"
@@ -293,8 +300,9 @@ while IFS= read -r line; do
 
 			# STEP 2: Begin rendering video
 			printf \
-				"[%s]     [VIDEO] Rendering via ffmpeg (%s %s w/ %s):\n" \
+				"[%s]     %s Rendering via ffmpeg (%s %s w/ %s):\n" \
 				"$(gettime)" \
+				"[${green}VIDEO${normal}]" \
 				"$value" "$mode" \
 				"$acodec"
 
@@ -344,8 +352,64 @@ while IFS= read -r line; do
 					"${SPATH}/processed/${F/avi/mkv}"
 			fi
 
+			echo ""
+
+			# STEP 3: Additional Audio Track Processsing
+			# If there are any extra audio files, convert to FLAC and process
+			i=0
+			cmd=""
+			map=""
+			metadata=""
+
+			while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
+				# Grab the title of the audio track from the ()'s
+				title=$(\
+					  ls "${F/.avi/} st${i} ("*").wav" \
+					| sed -e 's/.*(\(.*\)).*$/\1/'
+				)
+
+				printf \
+					"[%s]     %s Found Additional Audio Track: %s\n" \
+					"$(gettime)"                                     \
+					"[${yellow}EXTRA${normal}]"                      \
+					"$title"
+
+				# Encode to FLAC
+				${ffmpeg} \
+					-hide_banner                     \
+					-v quiet                         \
+					-y                               \
+					-i "${F/.avi/} st${i} ("*").wav" \
+					-acodec flac                     \
+					"${SPATH}/processed/__AUDIO_tmp${i}.flac"
+
+				cmd="${cmd} -i \"${SPATH}/processed/__AUDIO_tmp${i}.flac\""
+				let "i++"
+				map="${map} -map ${i}:a"
+				metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
+			done
+
+			# Append to the original file by making a copy, then overwriting
+			if [ $i -gt 0 ]; then
+				printf \
+					"[%s]     %s Muxing Extra Audio Tracks...\n" \
+					"$(gettime)"                                 \
+					"[${yellow}EXTRA${normal}]"
+
+
+				# Run FFMPEG
+				eval "${ffmpeg} -hide_banner -v quiet -stats -i \"${SPATH}/processed/${F/.avi/.mkv}\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${SPATH}/processed/tmp.mkv\""
+
+				# Cleanup and Overwrite
+				rm "${SPATH}/processed/__AUDIO_tmp"*".flac"
+				mv \
+					"${SPATH}/processed/tmp.mkv" \
+					"${SPATH}/processed/${F/.avi/.mkv}"
+				echo ""
+			fi
+
 			printf \
-				"[%s] Render Job Done!\n" \
+				"[%s]     [${green}NOTIC${normal}] Render Job Done!\n" \
 				"$(gettime)"
 		fi
 	done
