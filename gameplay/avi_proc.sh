@@ -7,15 +7,8 @@
 #     Renders all AVI videos in "queue" as MKV files into "processed". Any
 #     already-rendered videos will be skipped.
 #
-# Parameters:
-#     -a  AMPLIFY
-#         Normalises the first audio track in each rendered MKV.
-#
-#     -4  X264 RENDERING
-#         All files rendered will use x264
-#
-#     -5  X265 RENDERING
-#         All files rendered will use x265
+# Valid Parameters:
+#     adhjmv45
 #
 # Author:
 #     Clara Nguyen (@iDestyKK)
@@ -36,6 +29,8 @@ CODEC="libx265"
 NORMALISE=0
 PIX_FMT="yuv420p10le"
 VERBOSE=0
+JSON_EXPORT=0
+MULTITRACK=0
 
 # Where are we?
 SCRIPT=$(readlink -f "$0")
@@ -73,7 +68,7 @@ function show_head {
 
 # Show Help
 function show_help {
-	printf "Usage: %s [-adhv45]\n\n" "$0"
+	printf "Usage: %s [-adhjmv45]\n\n" "$0"
 
 	# About
 	show_head
@@ -95,6 +90,10 @@ function show_help {
 		"-d" "Disable 10-bit encoding"
 	printf "  %-4s %s\n" \
 		"-h" "Show Help (and terminate the script)"
+	printf "  %-4s %s\n" \
+		"-j" "Enable JSON Extra Data"
+	printf "  %-4s %s\n" \
+		"-m" "Enable Multitrack Audio Detection"
 	printf "  %-4s %s\n" \
 		"-v" "Verbose (Show more info)"
 	printf "  %-4s %s\n" \
@@ -141,6 +140,16 @@ if [ $# -eq 1 ]; then
 				exit 0
 				;;
 
+			j)
+				# Enable JSON Extra Data
+				JSON_EXPORT=1
+				;;
+
+			m)
+				# Enable Multitrack Audio Detection
+				MULTITRACK=1
+				;;
+
 			v)
 				# Verbose (show more info)
 				VERBOSE=1
@@ -148,7 +157,7 @@ if [ $# -eq 1 ]; then
 
 			*)
 				# Invalid Option
-				echo "Invalid Command: ${1:i-1:1}"
+				echo "[${yellow}WARNING${normal}] Invalid Command: ${1:i-1:1}"
 				;;
 		esac
 	done
@@ -221,8 +230,21 @@ printf " [ %-11s ]\n" "off"
 
 # Multitrack Audio Detection
 printf "  %-32s " "Multitrack Audio Detection"
-printf "[ ${green}%-11s${normal} ]" "on"
-printf " [ %-11s ]\n" "on"
+if [ $MULTITRACK != 0 ]; then
+	printf "[ ${yellow}%-11s${normal} ]" "on"
+else
+	printf "[ ${green}%-11s${normal} ]" "off"
+fi
+printf " [ %-11s ]\n" "off"
+
+# JSON Extra Data
+printf "  %-32s " "JSON Extra Data"
+if [ $JSON_EXPORT != 0 ]; then
+	printf "[ ${yellow}%-11s${normal} ]" "on"
+else
+	printf "[ ${green}%-11s${normal} ]" "off"
+fi
+printf " [ %-11s ]\n" "off"
 
 # Container Format
 printf "  %-32s " "Container Format"
@@ -355,57 +377,74 @@ while IFS= read -r line; do
 			echo ""
 
 			# STEP 3: Additional Audio Track Processsing
-			# If there are any extra audio files, convert to FLAC and process
-			i=0
-			cmd=""
-			map=""
-			metadata=""
 
-			while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
-				# Grab the title of the audio track from the ()'s
-				title=$(\
-					  ls "${F/.avi/} st${i} ("*").wav" \
-					| sed -e 's/.*(\(.*\)).*$/\1/'
-				)
+			if [ $MULTITRACK -eq 1 ]; then
+				# If there are any extra audio files, convert to FLAC and process
+				i=0
+				cmd=""
+				map=""
+				metadata=""
 
+				while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
+					# Grab the title of the audio track from the ()'s
+					title=$(\
+						  ls "${F/.avi/} st${i} ("*").wav" \
+						| sed -e 's/.*(\(.*\)).*$/\1/'
+					)
+
+					printf \
+						"[%s]     %s Found Additional Audio Track: %s\n" \
+						"$(gettime)"                                     \
+						"[${yellow}EXTRA${normal}]"                      \
+						"$title"
+
+					# Encode to FLAC
+					${ffmpeg} \
+						-hide_banner                     \
+						-v quiet                         \
+						-y                               \
+						-i "${F/.avi/} st${i} ("*").wav" \
+						-acodec flac                     \
+						"${SPATH}/processed/__AUDIO_tmp${i}.flac"
+
+					cmd="${cmd} -i \"${SPATH}/processed/__AUDIO_tmp${i}.flac\""
+					let "i++"
+					map="${map} -map ${i}:a"
+					metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
+				done
+
+				# Append to the original file by making a copy, then overwriting
+				if [ $i -gt 0 ]; then
+					printf \
+						"[%s]     %s Muxing Extra Audio Tracks...\n" \
+						"$(gettime)"                                 \
+						"[${yellow}EXTRA${normal}]"
+
+
+					# Run FFMPEG
+					eval "${ffmpeg} -hide_banner -v quiet -stats -i \"${SPATH}/processed/${F/.avi/.mkv}\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${SPATH}/processed/tmp.mkv\""
+
+					# Cleanup and Overwrite
+					rm "${SPATH}/processed/__AUDIO_tmp"*".flac"
+					mv \
+						"${SPATH}/processed/tmp.mkv" \
+						"${SPATH}/processed/${F/.avi/.mkv}"
+					echo ""
+				fi
+			fi
+
+			# STEP 4: Generate JSON file for the newly created video file
+			if [ $JSON_EXPORT -eq 1 ]; then
 				printf \
-					"[%s]     %s Found Additional Audio Track: %s\n" \
-					"$(gettime)"                                     \
-					"[${yellow}EXTRA${normal}]"                      \
-					"$title"
-
-				# Encode to FLAC
-				${ffmpeg} \
-					-hide_banner                     \
-					-v quiet                         \
-					-y                               \
-					-i "${F/.avi/} st${i} ("*").wav" \
-					-acodec flac                     \
-					"${SPATH}/processed/__AUDIO_tmp${i}.flac"
-
-				cmd="${cmd} -i \"${SPATH}/processed/__AUDIO_tmp${i}.flac\""
-				let "i++"
-				map="${map} -map ${i}:a"
-				metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
-			done
-
-			# Append to the original file by making a copy, then overwriting
-			if [ $i -gt 0 ]; then
-				printf \
-					"[%s]     %s Muxing Extra Audio Tracks...\n" \
-					"$(gettime)"                                 \
+					"[%s]     %s Generating JSON... " \
+					"$(gettime)"                      \
 					"[${yellow}EXTRA${normal}]"
 
+				"${UTIL}/gen_json.sh" \
+					"${SPATH}/processed/${F/.avi/.mkv}" \
+					> "${SPATH}/processed/json/${F/.avi/.json}"
 
-				# Run FFMPEG
-				eval "${ffmpeg} -hide_banner -v quiet -stats -i \"${SPATH}/processed/${F/.avi/.mkv}\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${SPATH}/processed/tmp.mkv\""
-
-				# Cleanup and Overwrite
-				rm "${SPATH}/processed/__AUDIO_tmp"*".flac"
-				mv \
-					"${SPATH}/processed/tmp.mkv" \
-					"${SPATH}/processed/${F/.avi/.mkv}"
-				echo ""
+				printf "Done!\n"
 			fi
 
 			printf \
@@ -416,222 +455,3 @@ while IFS= read -r line; do
 
 	cd "${SPATH}"
 done < "settings.dat"
-
-exit 1
-
-# -----------------------------------------------------------------------------
-# 5. Batch Rendering (LEGACY)                                              {{{1
-# -----------------------------------------------------------------------------
-
-# Define our folders and bitrates first
-folders=()
-bitrates=()
-names=()
-acodecs=()
-crfs=()
-presets=()
-num_dir=0
-
-TIME_STR=""
-
-function main {
-	# Add our directories
-	# add_directory "Misc"    "12000k" "queue/misc"
-	add_directory "Bluray"  "18000k" "queue/bluray"  "flac" "18" "slow"
-	add_directory "Regular" "12000k" "queue/regular" "flac" "23" "medium"
-
-	# Print out our fancy intro
-	# intro
-
-	# Process all of the directories
-	for ((i=0;i<${#folders[@]};i++)); do
-		scan "${folders[$i]}" "${bitrates[$i]}" "${names[$i]}" "${acodecs[$i]}" "${crfs[$i]}" "${presets[$i]}"
-	done
-}
-
-function add_directory {
-	#
-	# Function   : "add_directory"
-	# Synopsis   : add_directory(name, bitrate, path, acodec, crf, preset)
-	# Description: Adds a directory in to the queue for rendering.
-	#
-	
-	names[$num_dir]=$1
-	bitrates[$num_dir]=$2
-	folders[$num_dir]=$3
-	acodecs[$num_dir]=$4
-	crfs[$num_dir]=$5
-	presets[$num_dir]=$6
-	let "num_dir++"
-}
-
-function scan {
-	#
-	# Function   : "scan"
-	# Synopsis   : scan(path, bitrate, name, acodec, crf)
-	# Description: Scans directory for files, and renders them.
-	#
-	
-	path=$1
-	bitrate=$2
-	name=$3
-	acodec=$4
-	crf=$5
-	preset=$6
-
-	printf "[%s] Scanning %s directory\n" "$(gettime)" "$3"
-
-	farr=("$path/*.avi")
-	for file in $farr; do
-		render "$1" "$file" "$bitrate" "$acodec" "$crf" "$preset"
-	done
-}
-
-function render {
-	#
-	# Function   : "render"
-	# Synopsis   : render(file_path, bitrate, acodec, crf)
-	# Description: Computes audio amplification by searching for the peak point of
-	#              audio via ffmpeg. Then calls ffmpeg again to render video.
-	#
-	
-	dir=$1
-	file_path=$2
-	#file_name=$(echo "$file_path" | rev | cut -d"/" -f1 | rev)
-	file_name=$(basename "$file_path")
-	bitrate=$3
-	acodec=$4
-	crf=$5
-	preset=$6
-
-	if [ ! -e "./processed/${file_name/.avi/.mkv}" ]; then
-		printf \
-			"[%s] Processing %s...\n" \
-			"$(gettime)" \
-			"$file_name"
-
-		printf \
-			"[%s]     [AUDIO] Volume amp: " \
-			"$(gettime)"
-
-		printf "%sdB\n" 0
-
-		if [ $crf -eq 0 ]; then
-			printf \
-				"[%s]     [VIDEO] Rendering via ffmpeg (x264 @ %s CBR w/ %s):\n" \
-				$(gettime) \
-				"$bitrate" \
-				"$acodec"
-
-			${ffmpeg} \
-				-hide_banner                         \
-				-v quiet                             \
-				-stats                               \
-				-y                                   \
-				-i              "$dir/$file_name"    \
-				-map            0:0                  \
-				-map            0:1                  \
-				-strict -2                           \
-				-vcodec         ${CODEC}             \
-				-pix_fmt        ${PIX_FMT}           \
-				-vf             fps=60               \
-				-b:v            $bitrate             \
-				-maxrate        $bitrate             \
-				-bufsize        $bitrate             \
-				-c:a            $acodec              \
-				-metadata:s:a:0 title="Game Audio"   \
-				"./processed/${file_name/.avi/.mkv}"
-		else
-			printf \
-				"[%s]     [VIDEO] Rendering via ffmpeg (x264 @ %s CRF w/ %s):\n" \
-				$(gettime) \
-				"$crf" \
-				"$acodec"
-
-			${ffmpeg} \
-				-hide_banner                         \
-				-v quiet                             \
-				-stats                               \
-				-y                                   \
-				-i              "$dir/$file_name"    \
-				-map            0:0                  \
-				-map            0:1                  \
-				-strict         -2                   \
-				-vcodec         ${CODEC}             \
-				-pix_fmt        ${PIX_FMT}           \
-				-vf             fps=60               \
-				-crf            ${crf}               \
-				-preset         $preset              \
-				-c:a            $acodec              \
-				-metadata:s:a:0 title="Game Audio"   \
-				"./processed/${file_name/.avi/.mkv}"
-		fi
-
-		printf \
-			"[%s] Render Job Done!\n" \
-			"$(gettime)"
-
-		# If there are any extra audio files, convert to FLAC and process
-		i=0
-		cmd=""
-		map=""
-		metadata=""
-		while [ -e "$dir/${file_name/.avi/} st${i} ("*").wav" ]; do
-			printf \
-				"[%s] Found Additional Audio Track: %s\n" \
-				"$(gettime)"                              \
-				"$dir/${file_name/.avi/} st${i} ("*").wav"
-
-			title=$(ls "${dir}/${file_name/.avi/} st${i} ("*").wav" | sed -e 's/.*(\(.*\)).*$/\1/')
-
-			${ffmpeg} \
-				-hide_banner                                    \
-				-v quiet                                        \
-				-stats                                          \
-				-y                                              \
-				-i "${dir}/${file_name/.avi/} st${i} ("*").wav" \
-				-acodec flac                                    \
-				"./processed/__AUDIO_tmp${i}.flac"
-
-			cmd="${cmd} -i \"./processed/__AUDIO_tmp${i}.flac\""
-			let "i++"
-			map="${map} -map ${i}:a"
-			metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
-		done
-
-		# Append to the original file by making a copy, then overwriting
-		if [ $i -gt 0 ]; then
-			echo "${cmd}"
-			echo "${map}"
-			eval "${ffmpeg} -hide_banner -i \"./processed/${file_name/.avi/.mkv}\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"./processed/tmp.mkv\""
-			rm "processed/__AUDIO_tmp"*".flac"
-			mv "./processed/tmp.mkv" "./processed/${file_name/.avi/.mkv}"
-		fi
-
-		# Generate a json file
-		./gen_json.sh "./processed/${file_name/.avi/.mkv}" > "./processed/json/${file_name/.avi/.json}"
-	fi
-}
-
-function gettime {
-	printf $(date +%Y-%m-%d-%H:%M:%S)
-}
-
-function intro {
-	echo "*"
-	echo "* Dxtory Rendering Script for MW2 Gameplay (UNIX Version)"
-	echo "*"
-	echo "* Just sit back for now and let me do the work for you! I'll be scanning"
-	echo "* the following directories and then rendering AVIs (in this order):"
-	for ((i=0;i<${#folders[@]};i++)); do
-		printf "*     %-10s  %-16s %-6s (%s bitrate)\n" ${names[$i]} ${folders[$i]} ${acodecs[$i]} ${bitrates[$i]}
-	done
-	echo "*"
-	echo "* It'll probably take a while, so I hope you have something to do while"
-	echo "* I work. :) Expect your results to be in the \"processed\" directory!"
-	echo "*"
-	echo ""
-}
-
-# Finally, start the damn program.
-main
