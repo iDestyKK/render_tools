@@ -22,22 +22,33 @@ optimise space as efficiently as possible.
 ## Parameters
 You may pass parameters in as you run the script to change how it runs.
 ```
-  -a --amp   AMPLIFY (NORMALISE)
-             All videos encoded will be normalised to max volume. This will
-             require FFMPEG scanning through each video file to find the
-             loudest sound, which may take a while (This is recommended for
-             surround sound clips).
+  -a  AMPLIFY (NORMALISE)
+      All videos encoded will be normalised to max volume. This will
+      require FFMPEG scanning through each video file to find the
+      loudest sound, which may take a while (This is recommended for
+      surround sound clips).
 
-  -4 --x264  X264 ENCODE
-             All videos encoded will be encoded with the x264 codec. This is
-             faster than x265 but will feature less compression. In a nutshell,
-             you get faster encoding, with a larger file size and less quality.
+  -d  DISABLE 10-BIT ENCODING
+      By default, the script will encode all videos in 10-bit mode via
+      `yuv420ple10`. If this option is used, ffmpeg will encode in 8-bit
+      via `yuv420p` instead.
 
-  -5 --x265  X265 ENCODE
-             All videos encoded will be encoded with the x265 codec. This is
-             slower than x264 but will feature better compression. In a
-             nutshell, you get slower encoding, with a smaller file size and
-             better quality.
+  -h  HELP
+      Prints out a help prompt and kills the script after.
+
+  -v  VERBOSE
+      Prints out extra information.
+
+  -4  X264 ENCODE
+      All videos encoded will be encoded with the x264 codec. This is
+      faster than x265 but will feature less compression. In a nutshell,
+      you get faster encoding, with a larger file size and less quality.
+
+  -5  X265 ENCODE
+      All videos encoded will be encoded with the x265 codec. This is
+      slower than x264 but will feature better compression. In a
+      nutshell, you get slower encoding, with a smaller file size and
+      better quality.
 ```
 
 ## Examples
@@ -61,7 +72,7 @@ Encode in x265 with volume normalising
 ./avi_proc.sh -5a
 ```
 
-## ADDITIONAL AUDIO TRACKS
+## Additional Audio Tracks
 By default, the script will only use the very first audio track in the AVI
 file. However, if you have suppliment WAV files of similar names, the script
 will append them into the final MKV file. They must follow a strict syntax:
