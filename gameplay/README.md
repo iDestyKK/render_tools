@@ -36,6 +36,15 @@ You may pass parameters in as you run the script to change how it runs.
   -h  HELP
       Prints out a help prompt and kills the script after.
 
+  -j  JSON EXTRA DATA
+      Will call gen_json.sh from "util" to generate a JSON file for a
+      newly created MKV file. This can be useful if "-a" (amplify) is
+      used, as the amplification value is stored.
+
+  -m  MULTITRACK AUDIO DETECTION
+      See "Additional Audio Tracks" below. This switches detection for
+      additional audio tracks to on.
+
   -v  VERBOSE
       Prints out extra information.
 
@@ -72,10 +81,17 @@ Encode in x265 with volume normalising
 ./avi_proc.sh -5a
 ```
 
+Encode in x265 with multitrack audio detection, JSON file generation,
+and volume normalising
+```bash
+./avi_proc.sh -5ajm
+```
+
 ## Additional Audio Tracks
 By default, the script will only use the very first audio track in the AVI
 file. However, if you have suppliment WAV files of similar names, the script
-will append them into the final MKV file. They must follow a strict syntax:
+can append them into the final MKV file if `-m` is supplied as an argument.
+They must follow a strict syntax:
 
 ```
 gameplay.avi
