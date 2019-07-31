@@ -1,25 +1,30 @@
 # Batch Gameplay Video Rendering via FFMPEG
 
 ## Synopsis
-  FFMPEG-powered batch renderer for gameplay footage. Now that's how it's done.
-  Takes AVI files in the "queue" directory and renders it. These files are
-  stored in the "processed" directory as MKV files.
+FFMPEG-powered batch renderer for gameplay footage. Now that's how it's done.
+Takes AVI files in the "queue" directory and renders it. These files are
+stored in the "processed" directory as MKV files.
 
-## Main
 The renderer has 2 presets for rendering videos. These are based on how good
 you want the quality of the final video to be:
 
-* Regular - CRF 23 - Medium Speed (Average Size, Lower Quality )
-* Bluray  - CRF 18 - Slow Speed   (Smaller Size, Higher Quality)
+* Regular - CRF 23 - Medium Speed (Average Size, Lower Quality)
+* Bluray  - CRF 18 - Slow Speed (Smaller Size, Higher Quality)
 
 Videos that are already rendered will be skipped in future runs of the
 script as long as they are present in the "processed" directory.
 
-Codecs used are determined in the parameters, but the default is x265. The
-pixel format is yuv420p10le, so the videos are being encoded in 10-bit to
+Codecs used are determined in the parameters, but the default is **x265**. The
+pixel format is **yuv420p10le**, so the videos are being encoded in 10-bit to
 optimise space as efficiently as possible.
 
-## Parameters
+## Usage/Parameters
+```bash
+UNIX> ./avi_proc.sh -h
+Usage: ./avi_proc.sh [-adhjmv45]
+...
+```
+
 You may pass parameters in as you run the script to change how it runs.
 ```
   -a  AMPLIFY (NORMALISE)
@@ -30,8 +35,8 @@ You may pass parameters in as you run the script to change how it runs.
 
   -d  DISABLE 10-BIT ENCODING
       By default, the script will encode all videos in 10-bit mode via
-      `yuv420ple10`. If this option is used, ffmpeg will encode in 8-bit
-      via `yuv420p` instead.
+      "yuv420ple10". If this option is used, ffmpeg will encode in 8-bit
+      via "yuv420p" instead.
 
   -h  HELP
       Prints out a help prompt and kills the script after.
@@ -100,6 +105,6 @@ gameplay st1 (TRACK_NAME).wav
 gameplay st2 (TRACK_NAME).wav
 ```
 
-"TRACK_NAME" is replaced with the name. So `gameplay st0 (Voice - DKK).wav`
+"TRACK\_NAME" is replaced with the name. So `gameplay st0 (Voice - DKK).wav`
 is valid. When the final render is complete, open the MKV in VLC and the
 tracks will be there.
