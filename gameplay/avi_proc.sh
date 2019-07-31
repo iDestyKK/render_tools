@@ -37,6 +37,7 @@ SCRIPT=$(readlink -f "$0")
 SPATH=$(dirname "$SCRIPT")
 UTIL="${SPATH}/../util"
 ffmpeg="${UTIL}/ffmpeg.exe"
+PR="${SPATH}/processed"
 
 # Helper script to check if a file exists
 function __chk {
@@ -279,14 +280,12 @@ while IFS= read -r line; do
 	cd "${SPATH}/${folder}"
 
 	# Go through every AVI and process
+	for F in *.avi; do
+		# Get filename of new MKV file to be made
+		MKV_F="${F/.avi/.mkv}"
 
-	# for F in $(find *.avi -type f -print 2> /dev/null | xargs -r0 echo); do
-
-	# Fucking cheat. I'm tired.
-	IFS=$'\n'
-	for F in $(ls -1 *".avi" 2> /dev/null); do
 		# Skip the file if it already exists in the "processed" directory
-		if [ ! -e "${SPATH}/processed/${F/avi/mkv}" ]; then
+		if [ ! -e "${PR}/${MKV_F}" ]; then
 			printf \
 				"[%s] Processing %s...\n" \
 				"$(gettime)" \
@@ -347,7 +346,7 @@ while IFS= read -r line; do
 					-c:a            $acodec                   \
 					-x265-params    log-level=error           \
 					-metadata:s:a:0 title="Game Audio"        \
-					"${SPATH}/processed/${F/avi/mkv}"
+					"${PR}/__RENDER.mkv"
 			elif [ "$mode" == "crf" ]; then
 				# We are encoding with variable bitrate
 				${ffmpeg} \
@@ -356,6 +355,7 @@ while IFS= read -r line; do
 					-stats                                    \
 					-y                                        \
 					-i              "$F"                      \
+					-pattern_type   none                      \
 					-map            0:0                       \
 					-map            0:1                       \
 					-strict         -2                        \
@@ -366,10 +366,11 @@ while IFS= read -r line; do
 					-crf            $value                    \
 					-preset         $preset                   \
 					-c:a            $acodec                   \
-					-x265-params    log-level=error           \
+					-x265-params    log-level=info            \
 					-metadata:s:a:0 title="Game Audio"        \
-					"${SPATH}/processed/${F/avi/mkv}"
+					"${PR}/__RENDER.mkv"
 			fi
+
 
 			echo ""
 
@@ -402,9 +403,9 @@ while IFS= read -r line; do
 						-y                               \
 						-i "${F/.avi/} st${i} ("*").wav" \
 						-acodec flac                     \
-						"${SPATH}/processed/__AUDIO_tmp${i}.flac"
+						"${PR}/__AUDIO_tmp${i}.flac"
 
-					cmd="${cmd} -i \"${SPATH}/processed/__AUDIO_tmp${i}.flac\""
+					cmd="${cmd} -i \"${PR}/__AUDIO_tmp${i}.flac\""
 					let "i++"
 					map="${map} -map ${i}:a"
 					metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
@@ -419,13 +420,13 @@ while IFS= read -r line; do
 
 
 					# Run FFMPEG
-					eval "${ffmpeg} -hide_banner -v quiet -stats -i \"${SPATH}/processed/${F/.avi/.mkv}\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${SPATH}/processed/tmp.mkv\""
+					eval "${ffmpeg} -hide_banner -v quiet -stats -i \"${PR}/__RENDER.mkv\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${PR}/tmp.mkv\""
 
 					# Cleanup and Overwrite
-					rm "${SPATH}/processed/__AUDIO_tmp"*".flac"
+					rm "${PR}/__AUDIO_tmp"*".flac"
 					mv \
-						"${SPATH}/processed/tmp.mkv" \
-						"${SPATH}/processed/${F/.avi/.mkv}"
+						"${PR}/tmp.mkv" \
+						"${PR}/__RENDER.mkv"
 					echo ""
 				fi
 			fi
@@ -438,11 +439,15 @@ while IFS= read -r line; do
 					"[${yellow}EXTRA${normal}]"
 
 				"${UTIL}/gen_json.sh" \
-					"${SPATH}/processed/${F/.avi/.mkv}" \
-					> "${SPATH}/processed/json/${F/.avi/.json}"
+					"$PR/__RENDER.mkv" \
+					| sed "s/__RENDER/${F/.avi/}/" \
+					> "${PR}/json/${F/.avi/.json}"
 
 				printf "Done!\n"
 			fi
+
+			# Wow...
+			mv "${PR}/__RENDER.mkv" "${PR}/${MKV_F}"
 
 			printf \
 				"[%s]     [${green}NOTIC${normal}] Render Job Done!\n\n\n" \
@@ -456,4 +461,4 @@ while IFS= read -r line; do
 	done
 
 	cd "${SPATH}"
-done < "settings.dat"
+done < "${SPATH}/settings.dat"
