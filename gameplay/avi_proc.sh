@@ -254,7 +254,7 @@ printf " [ %-11s ]\n" "mkv"
 printf "\n"
 
 # -----------------------------------------------------------------------------
-# 5. Batch Rendering (NEW)                                                 {{{1
+# 5. Batch Rendering                                                       {{{1
 # -----------------------------------------------------------------------------
 
 function gettime {
@@ -313,9 +313,6 @@ while IFS= read -r line; do
 					| grep "max_volume" \
 					| sed 's/.*-\(.*\) dB/\1/'
 				)
-
-				# Clean up
-				rm audio_info.dat
 			fi
 
 			printf "%sdB\n" "$AMPLIFY_AMT"
@@ -448,8 +445,13 @@ while IFS= read -r line; do
 			fi
 
 			printf \
-				"[%s]     [${green}NOTIC${normal}] Render Job Done!\n" \
+				"[%s]     [${green}NOTIC${normal}] Render Job Done!\n\n\n" \
 				"$(gettime)"
+
+			# Clean up
+			if [ $NORMALISE -ne 0 ]; then
+				rm audio_info.dat
+			fi
 		fi
 	done
 
