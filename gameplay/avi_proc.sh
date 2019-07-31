@@ -36,8 +36,19 @@ MULTITRACK=0
 SCRIPT=$(readlink -f "$0")
 SPATH=$(dirname "$SCRIPT")
 UTIL="${SPATH}/../util"
-ffmpeg="${UTIL}/ffmpeg.exe"
 PR="${SPATH}/processed"
+
+# Check FFMPEG.
+ffmpeg=""
+
+if [ -x "$(command -v ffmpeg)" ]; then
+	# If there is a command for "ffmpeg", use that
+	ffmpeg="ffmpeg"
+elif [ -e "${UTIL}/ffmpeg.exe" ]; then
+	# For Windows Users, if they put a "ffmpeg.exe" in "util", it can be used.
+	# For other OS's, you can try this as well to bypass the "ffmpeg" command.
+	ffmpeg="${UTIL}/ffmpeg.exe"
+fi
 
 # Helper script to check if a file exists
 function __chk {
@@ -175,7 +186,13 @@ if [ $VERBOSE -eq 1 ]; then
 	printf "\nChecking...\n"
 fi
 
-__chk "${UTIL}/ffmpeg.exe"
+# FFMPEG
+if [ "$ffmpeg" == "" ]; then
+	printf "[${red}FATAL${normal}] \"%s\" could not be found...\n" "$1" 1>&2
+	exit 1
+fi
+
+# Others
 __chk "${UTIL}/gen_json.sh"
 __chk "settings.dat"
 __chk "queue"
