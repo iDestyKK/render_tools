@@ -259,7 +259,17 @@ printf "\n"
 # -----------------------------------------------------------------------------
 
 function gettime {
+	OIFS=$IFS
+	IFS=$'\n'
 	printf $(date +%Y-%m-%d\ -\ %H:%M:%S)
+	IFS=$OIFS
+}
+
+function gettime_mkv {
+	OIFS=$IFS
+	IFS=$'\n'
+	printf $(date +%Y-%m-%d\ %H:%M:%S)
+	IFS=$OIFS
 }
 
 while IFS= read -r line; do
@@ -290,6 +300,15 @@ while IFS= read -r line; do
 				"[%s] Processing %s...\n" \
 				"$(gettime)" \
 				"$F"
+
+			# Get Creation Time Metadata
+			DATE_REC=$(stat "$F" \
+				| grep "Birth: " \
+				| sed 's/.*: \(.*-.*-.* .*:.*:.*\..*\) .*/\1/'
+			)
+
+			# Also get Date Encoded Metadata
+			DATE_ENC=$(gettime_mkv)
 
 			# STEP 1: Get Audio Amplification (if enabled)
 			printf \
@@ -327,47 +346,51 @@ while IFS= read -r line; do
 			if [ "$mode" == "cbr" ]; then
 				# We are encoding with a bitrate
 				${ffmpeg} \
-					-hide_banner                              \
-					-v              quiet                     \
-					-stats                                    \
-					-y                                        \
-					-i              "$F"                      \
-					-map            0:0                       \
-					-map            0:1                       \
-					-strict         -2                        \
-					-vcodec         ${CODEC}                  \
-					-pix_fmt        ${PIX_FMT}                \
-					-vf             fps=60                    \
-					-af             "volume=${AMPLIFY_AMT}dB" \
-					-b:v            $value                    \
-					-maxrate        $value                    \
-					-bufsize        $value                    \
-					-preset         $preset                   \
-					-c:a            $acodec                   \
-					-x265-params    log-level=error           \
-					-metadata:s:a:0 title="Game Audio"        \
+					-hide_banner                                \
+					-v              quiet                       \
+					-stats                                      \
+					-y                                          \
+					-i              "$F"                        \
+					-map            0:0                         \
+					-map            0:1                         \
+					-strict         -2                          \
+					-vcodec         ${CODEC}                    \
+					-pix_fmt        ${PIX_FMT}                  \
+					-vf             fps=60                      \
+					-af             "volume=${AMPLIFY_AMT}dB"   \
+					-b:v            $value                      \
+					-maxrate        $value                      \
+					-bufsize        $value                      \
+					-preset         $preset                     \
+					-c:a            $acodec                     \
+					-x265-params    log-level=error             \
+					-metadata:s:a:0 title="Game Audio"          \
+					-metadata       DATE_RECORDED="${DATE_REC}" \
+					-metadata       DATE_ENCODED="${DATE_ENC}"  \
 					"${PR}/__RENDER.mkv"
 			elif [ "$mode" == "crf" ]; then
 				# We are encoding with variable bitrate
 				${ffmpeg} \
-					-hide_banner                              \
-					-v              quiet                     \
-					-stats                                    \
-					-y                                        \
-					-i              "$F"                      \
-					-pattern_type   none                      \
-					-map            0:0                       \
-					-map            0:1                       \
-					-strict         -2                        \
-					-vcodec         ${CODEC}                  \
-					-pix_fmt        ${PIX_FMT}                \
-					-vf             fps=60                    \
-					-af             "volume=${AMPLIFY_AMT}dB" \
-					-crf            $value                    \
-					-preset         $preset                   \
-					-c:a            $acodec                   \
-					-x265-params    log-level=info            \
-					-metadata:s:a:0 title="Game Audio"        \
+					-hide_banner                                \
+					-v              quiet                       \
+					-stats                                      \
+					-y                                          \
+					-i              "$F"                        \
+					-pattern_type   none                        \
+					-map            0:0                         \
+					-map            0:1                         \
+					-strict         -2                          \
+					-vcodec         ${CODEC}                    \
+					-pix_fmt        ${PIX_FMT}                  \
+					-vf             fps=60                      \
+					-af             "volume=${AMPLIFY_AMT}dB"   \
+					-crf            $value                      \
+					-preset         $preset                     \
+					-c:a            $acodec                     \
+					-x265-params    log-level=error             \
+					-metadata:s:a:0 title="Game Audio"          \
+					-metadata       DATE_RECORDED="${DATE_REC}" \
+					-metadata       DATE_ENCODED="${DATE_ENC}"  \
 					"${PR}/__RENDER.mkv"
 			fi
 
