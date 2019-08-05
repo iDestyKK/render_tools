@@ -307,7 +307,11 @@ while IFS= read -r line; do
 	cd "${SPATH}/${folder}"
 
 	# Go through every AVI and process
-	for F in *.avi; do
+	#for F in *.avi; do
+	
+	# Fucking cheat. I'm tired.
+	IFS=$'\n'
+	for F in $(ls -1 *".avi" 2> /dev/null); do
 		# Get filename of new MKV file to be made
 		MKV_F="${F/.avi/.mkv}"
 
