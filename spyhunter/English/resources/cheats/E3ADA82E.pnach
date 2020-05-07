@@ -1,0 +1,5 @@
+gametitle=Spy Hunter (SLUS-20056)
+comment=60 FPS by asasega
+
+//60 FPS
+patch=1,EE,202DDEB8,word,00000000
