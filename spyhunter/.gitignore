@@ -11,6 +11,5 @@
 
 # Temporary files, etc
 *.old.*
-final
 __concat.txt
 fix_clear.sh
