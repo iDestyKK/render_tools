@@ -75,9 +75,31 @@ UNIX> ./gen_vid_seconds.sh video
 ```
 Outputs a `video`'s duration in seconds with decimals preserved.
 
+### render.sh
+```bash
+UNIX> ./render.sh dir
+```
+Goes to `dir` and encodes `intro.avi`, `clear.avi`, and `mission.avi` into MKV
+files for processing with the scripts above. For each AVI file, two MKV files
+are created. One has watermark (intro.avi -> intro.wm.mkv), and one doesn't
+(intro.avi -> intro.raw.mkv). Compression is done via x265 10bit CRF 17 with
+the "medium" preset.
+
+### render\_endmov.sh
+```bash
+UNIX> ./render_endmov.sh dir
+```
+Same as `./render.sh`, but for `end_mov.mkv` instead. This will create
+`end_mov.wm.mkv` and `end_mov.raw.mkv`. `end_mov.mkv` is a transcoding of the
+original video files on the PS2 disc. The script will crop out the black bars
+and force a 16x9 ratio. Other than the black bars, the original picture is left
+untouched. This is so it'll look correct when concatenated with the widescreen
+gameplay footage.
+
 ## Production Procedure
 1. Record gameplay via PCSX2 and export to AVI.
-2. Encode each section as its own MKV file (watermarked and raw), respectively:
+2. Encode each section as its own MKV file (watermarked and raw) via
+   `render.sh` and `render_endmov.sh`. Respectively these files:
    * **intro.mkv** - Level Description. Weapons/Enemies overview, etc.
    * **mission.mkv** - Mission gameplay.
    * **end\_mov.mkv** - Mission ending cinematic.
