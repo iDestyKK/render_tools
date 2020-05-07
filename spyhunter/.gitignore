@@ -1,0 +1,16 @@
+# VIM swap files (.file.swp, .file.swo, ...)
+.*.sw*
+
+# Audio files
+*.flac
+*.wav
+
+# Video files
+*.avi
+*.mkv
+
+# Temporary files, etc
+*.old.*
+final
+__concat.txt
+fix_clear.sh
