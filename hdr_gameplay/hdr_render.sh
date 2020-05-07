@@ -76,21 +76,58 @@ function render {
 
 	DATE_ENC=$(gettime_mkv)
 
-	ffmpeg \
-		-i "${F}"                                                             \
-		-pix_fmt yuv420p10le                                                  \
-		-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
-		-c:v libx265                                                          \
-		-preset medium                                                        \
-		-crf 16                                                               \
-		-x265-params "${X265_P}"                                              \
-		-c:a flac                                                             \
-		-map 0:v                                                              \
-		-map 0:1                                                              \
-		-metadata:s:a:0 title="Game Audio"                                    \
-		-metadata DATE_RECORDED="${DATE_REC}"                                 \
-		-metadata DATE_ENCODED="${DATE_ENC}"                                  \
-		"${PR}/__RENDER.mkv"
+	# Detect a 16 channel audio file and process accordingly if so
+	SRAW="${F/.avi/ (16ch).wav}"
+	if [ -e "$SRAW" ]; then
+		# Generate 16-channel TTA (True Audio) track.
+		ffmpeg \
+			-i "$SRAW" \
+			-c:a tta   \
+			"${PR}/__AUDIO_tmp_16ch.tta"
+
+		# Render with a 7.1 track generated instead. This mix is generated from
+		# the 16 channels being "flattened" into 8 via:
+		#     FL = c00 + c08 + c12
+		#     FR = c01 + c09 + c13
+		#     BL = c04 + c10 + c14
+		#     BR = c05 + c11 + c15
+
+		ffmpeg \
+			-i "${F}"                                                         \
+			-i "$SRAW"                                                        \
+			-pix_fmt yuv420p10le                                              \
+			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
+			-filter_complex "[1:a]pan=7.1|c0=c0+c8+c12|c1=c1+c9+c13|c2=c2|c3=c3|c4=c4+c10+c14|c5=c5+c11+c15|c6=c6|c7=c7[a]" \
+			-c:v libx265                                                      \
+			-preset medium                                                    \
+			-crf 16                                                           \
+			-x265-params "${X265_P}"                                          \
+			-c:a flac                                                         \
+			-compression_level 12                                             \
+			-map 0:v                                                          \
+			-map "[a]"                                                        \
+			-metadata:s:a:0 title="Game Audio"                                \
+			-metadata DATE_RECORDED="${DATE_REC}"                             \
+			-metadata DATE_ENCODED="${DATE_ENC}"                              \
+			"${PR}/__RENDER.mkv"
+	else
+		ffmpeg \
+			-i "${F}"                                                         \
+			-pix_fmt yuv420p10le                                              \
+			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
+			-c:v libx265                                                      \
+			-preset medium                                                    \
+			-crf 16                                                           \
+			-x265-params "${X265_P}"                                          \
+			-c:a flac                                                         \
+			-compression_level 12                                             \
+			-map 0:v                                                          \
+			-map 0:1                                                          \
+			-metadata:s:a:0 title="Game Audio"                                \
+			-metadata DATE_RECORDED="${DATE_REC}"                             \
+			-metadata DATE_ENCODED="${DATE_ENC}"                              \
+			"${PR}/__RENDER.mkv"
+	fi
 
 	# If there are any extra audio files, convert to FLAC and process
 	i=0
@@ -127,6 +164,20 @@ function render {
 		metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
 	done
 
+	# If the 16 channel one was created, add that one in the mix as last track
+	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+		printf \
+			"[%s]     %s Found Additional Audio Track: %s\n" \
+			"$(gettime)"                                     \
+			"[${yellow}EXTRA${normal}]"                      \
+			"16 Channel Master"
+
+		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
+		let "i++"
+		map="${map} -map ${i}:a"
+		metadata="${metadata} -metadata:s:a:${i} title=\"Game Audio [16 Channel]\""
+	fi
+
 	# Append to the original file by making a copy, then overwriting
 	if [ $i -gt 0 ]; then
 		printf \
@@ -139,7 +190,7 @@ function render {
 		eval "ffmpeg -hide_banner -v quiet -stats -i \"${PR}/__RENDER.mkv\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${PR}/tmp.mkv\""
 
 		# Cleanup and Overwrite
-		rm "${PR}/__AUDIO_tmp"*".flac"
+		rm -f "${PR}/__AUDIO_tmp"*".flac" "${PR}/__AUDIO_tmp_16ch.tta"
 		mv \
 			"${PR}/tmp.mkv" \
 			"${PR}/__RENDER.mkv"
