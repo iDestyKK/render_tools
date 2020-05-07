@@ -106,7 +106,7 @@ function render {
 			-compression_level 12                                             \
 			-map 0:v                                                          \
 			-map "[a]"                                                        \
-			-metadata:s:a:0 title="Game Audio"                                \
+			-metadata:s:a:0 title="Game Audio [7.1 Surround]"                 \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
