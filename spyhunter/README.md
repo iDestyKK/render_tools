@@ -12,8 +12,15 @@ that is thrown into the final delivery MKV files, such as the following:
 The playthrough consists of playing the game twice. First run is in Japanese
 (because the Japanese version has almost no footage on the Internet). Second
 run is in English. There are 14 levels overall, so that's 28 videos. However, I
-store two versions of each video (with and without watermark), making 56 total.
-For YouTube, the watermarked version is uploaded.
+store two versions of each video (with and without watermark), making **56
+total**. For YouTube, the watermarked version is uploaded. These are all done
+natively in true 4K (3840x2160) using PCSX2. Widescreen and 60 FPS patches were
+also used to force the game to be in the correct format for the ultimate
+experience.
+
+Widescreen patches are available in `$LANG/resources` with proper credit given
+in each file to who made it. Since no dump of the Japanese ISO is out, no
+Widescreen or 60 FPS patch was available for it. I made those one myself.
 
 5.1 Surround Sound audio track is possible by enabling "Surround" in the audio
 settings. The engine utilises Dolby Pro Logic II, which can be dematrix'd into
