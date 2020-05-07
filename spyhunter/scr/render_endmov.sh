@@ -1,4 +1,25 @@
 #!/bin/bash
+#
+# Render End Movie (Level End Cinematic)
+#
+# Description:
+#     When given a directory "dir", will compress "end_mov.mkv" into MKV files.
+#     A raw and a watermarked file will be created. In this case, that's
+#     "end_mov.raw.mkv" and "end_mov.wm.mkv".
+#
+#     The original "end_mov.mkv" is a transcoded version losslessly converted
+#     straight from the game files. You can generate this file with FFmpeg.
+#     This script takes advantage of the mission ending cinematics being at
+#     an aspect ratio of 48:25 and removes as much of the black bars as
+#     possible to make it 16x9. This is so it'll look correct with the
+#     widescreen mission gameplay. Other than black bars, nothing is cropped.
+#
+#     This script compresses the same way as "render.sh" does. x265 10bit at
+#     CRF 17 with the "medium" preset being used.
+#
+# Author:
+#     Clara Nguyen (@iDestyKK)
+#
 
 # Argument Check
 if [ $# -ne 1 ]; then

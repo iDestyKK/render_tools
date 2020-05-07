@@ -1,4 +1,21 @@
 #!/bin/bash
+#
+# Render
+#
+# Description:
+#     When given a directory "dir", will compress "intro.avi", "mission.avi",
+#     and "clear.avi" into MKV files. Files missing is OK and they will just be
+#     skipped. For each AVI, a raw and a watermarked file will be created. For
+#     example: given a "intro.avi" both "intro.raw.mkv" and "intro.wm.mkv" will
+#     be created.
+#
+#     AVI files should be losslessly archived. For compactness, utvideo is
+#     used. This script takes those and compresses via x265 10bit at CRF 17.
+#     The "medium" preset for x265 is used.
+#
+# Author:
+#     Clara Nguyen (@iDestyKK)
+#
 
 # Argument Check
 if [ $# -ne 1 ]; then
