@@ -1,0 +1,5 @@
+gametitle=Spy Hunter (SLPM-65090)
+comment=60 FPS by iDestyKK
+
+//60 FPS
+patch=1,EE,202D51F8,word,00000000

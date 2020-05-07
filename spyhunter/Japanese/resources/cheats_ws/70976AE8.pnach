@@ -1,0 +1,5 @@
+gametitle=Spy Hunter (SLPM-65090)
+comment=Widescreen Patch (16:9) by iDestyKK
+
+//FOV
+patch=1,EE,20371360,word,3F400000
