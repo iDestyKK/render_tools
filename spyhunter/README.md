@@ -1,4 +1,4 @@
-# SpyHunter Video "Compilation" via FFMPEG
+# SpyHunter (2001) Video "Compilation" via FFMPEG
 
 ## Synopsis
 Collection of scripts and file structure for how the SpyHunter gameplay videos
@@ -26,11 +26,17 @@ Inside the `scr` directory, there are a few bash scripts that made this
 production much more trivial, as a most of it can be automated.
 
 ### checklist.sh
+```bash
+UNIX> ./checklist.sh
+```
 Quality-of-Life script to quickly determine what files are missing for a level
 prior to compilation. If a level's row is all "OK"s, running `compile.sh` will
 generate the final MKV for upload.
 
 ### compile.sh
+```bash
+UNIX> ./compile.sh
+```
 Goes into each level's directory and, if all of the required files exist, will
 generate the final MKV files for uploading to YouTube. Each level has 4 videos
 created:
