@@ -34,7 +34,7 @@ in there.
 Additional tracks are encoded with **FLAC** with `-compression_level 12`.
 
 ### 16 Channel Mode
-If the script detects the existance of a `gameplay (16ch).wav`, it will do a
+If the script detects the existence of a `gameplay (16ch).wav`, it will do a
 few extra things:
 
 1. A valid 7.1 surround sound audio track will be generated and will replace
