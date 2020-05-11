@@ -9,6 +9,8 @@ losing them...).
 ## Renderers
 Each directory has a "system" of rendering tools with very specific usages.
 They are all powered by FFmpeg. Their development branch is also listed below.
+If I haven't made the tools/scripts for a section public yet, the
+**Dev Branch** will show as `n/a`.
 
 | Name               | Dev Branch         | Description |
 | ------------------ | ------------------ | --- |
