@@ -38,11 +38,12 @@ If the script detects the existence of a `gameplay (16ch).wav`, it will do a
 few extra things:
 
 1. A valid 7.1 surround sound audio track will be generated and will replace
-   the very first track in the rendered file with it (FLAC compression level
-   12).
+   the very first track in the rendered file with it (**FLAC** compression
+   level 12).
 2. The original 16 channel track will be compressed and appended in as an
-   additional audio track. Because FLAC only goes up to 8 channels, TTA (True
-   Audio) is used instead. This will appear as the last track in the MKV file.
+   additional audio track. Because **FLAC** only goes up to 8 channels, **TTA
+   (True Audio)** is used instead. This will appear as the last track in the
+   MKV file.
 
 This is a very experimental mode and used for Modern Warfare (2019) gameplay
 where the channel layout is as assumed:
@@ -68,5 +69,5 @@ This 16 channel layout is known as **7.1.4.4** Surround Sound according to
 Dolby. It features leveling information both above and below the listener. This
 is second only to **8.1.4.4** in terms of surround sound formats. Supposedly
 Modern Warfare supports this as well. If it does, expect an update to switch
-**TTA** to **WV (WavPack)** for 17 channel support as a `SPEAKER_BACK_CENTRE`
-would be nice...
+**TTA (True Audio)** to **WV (WavPack)** for 17 channel support as a
+`SPEAKER_BACK_CENTRE` would be nice...
