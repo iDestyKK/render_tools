@@ -33,7 +33,7 @@ in there.
 
 Additional tracks are encoded with **FLAC** with `-compression_level 12`.
 
-### 16 Channel Mode
+### 16 Channel Mode (Dolby Atmos 7.1.4.4)
 If the script detects the existence of a `gameplay (16ch).wav`, it will do a
 few extra things:
 
@@ -64,5 +64,9 @@ where the channel layout is as assumed:
 0E - SPEAKER_BOTTOM_BACK_LEFT
 0F - SPEAKER_BOTTOM_BACK_RIGHT
 ```
-Apparently bottom (ground) channels aren't even standard. This may update in
-the future as I learn more information about how it works.
+This 16 channel layout is known as **7.1.4.4** Surround Sound according to
+Dolby. It features leveling information both above and below the listener. This
+is second only to **8.1.4.4** in terms of surround sound formats. Supposedly
+Modern Warfare supports this as well. If it does, expect an update to switch
+**TTA** to **WV (WavPack)** for 17 channel support as a `SPEAKER_BACK_CENTRE`
+would be nice...
