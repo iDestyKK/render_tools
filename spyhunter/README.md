@@ -74,6 +74,18 @@ files store a lossless stereo track which has surround information via Dolby
 Pro Logic II. This uses that information to generate the 5.0 stream. The output
 file is then used to generate `stereo.flac` and `5.1.flac`.
 
+### gen\_frames.sh
+```bash
+UNIX> ./gen_frames.sh avi
+```
+Makes a directory called `frames` directory where a given `avi` resides. Then,
+exports every frame in `avi` as a PNG file in this new directory. This is for
+manual frame-by-frame editing in the event After Effects `utcodec` reader
+glitches out (which it did... somehow) and is unable to edit properly.
+
+Frames are generated with the `frame%05.png` format string (e.g.
+`frame00000.png`, `frame00001.png`, `frame00002.png`, ...).
+
 ### gen\_vid\_ffmetadata.sh
 ```bash
 UNIX> ./gen_vid_ffmetadata.sh dir > ffmetadata.txt
@@ -108,6 +120,17 @@ original video files on the PS2 disc. The script will crop out the black bars
 and force a 16x9 ratio. Other than the black bars, the original picture is left
 untouched. This is so it'll look correct when concatenated with the widescreen
 gameplay footage.
+
+### render\_frames.sh
+```bash
+UNIX> ./render_frames.sh dir
+```
+Same as `./render.sh` but will look for a `frames` directory in the given `dir`
+and encode those frames instead of an AVI file. This is to be used after using
+`./gen_frames.sh` and editing frames manually as PNG files.
+
+Frames in the `frames` directory must follow the `frame%05.png` format string
+(e.g. `frame00000.png`, `frame00001.png`, `frame00002.png`, ...).
 
 ## Production Procedure
 1. Record gameplay via PCSX2 and export to AVI.
