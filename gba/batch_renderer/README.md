@@ -106,11 +106,11 @@ In `gameplay`, the `-a` option was for amplification of audio. Here, it's
 different... much more different.
 
 So apparently AVI and WAV files exported raw compress extremely well via XZ. In
-fact, an archive of the raw resources via this has a compression ratio of
-around **0.0074** (on average via testing a handful of clips...). Thus, it is
+fact, an archive of the raw resources via this is around **0.0074x** its
+original size (on average via testing a handful of clips...). Thus, it is
 feasible to store the original files compressed into the final MKV as an
 attachment. In fact, it's recommended. This way, if you ever need to go back to
-the original files, you have an option.
+the original files, you have an extra (somewhat esoteric) option.
 
 Conveniently, I have made this an option to do automatically. Just tack on `-a`
 in the command:
