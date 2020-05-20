@@ -42,8 +42,8 @@ few extra things:
    level 12).
 2. The original 16 channel track will be compressed and appended in as an
    additional audio track. Because **FLAC** only goes up to 8 channels, **TTA
-   (True Audio)** is used instead. This will appear as the last track in the
-   MKV file.
+   (True Audio)** is used instead. This track will come right after the 7.1
+   surround track mix in the MKV file.
 
 This is a very experimental mode and used for Modern Warfare (2019) gameplay
 where the channel layout is as assumed:
@@ -65,9 +65,9 @@ where the channel layout is as assumed:
 0E - SPEAKER_BOTTOM_BACK_LEFT
 0F - SPEAKER_BOTTOM_BACK_RIGHT
 ```
-This 16 channel layout is known as **7.1.4.4** Surround Sound according to
+This 16 channel layout is known as **7.1.4.4** Spatial Sound according to
 Dolby. It features leveling information both above and below the listener. This
-is second only to **8.1.4.4** in terms of surround sound formats. Supposedly
+is second only to **8.1.4.4** in terms of spatial sound formats. Supposedly
 Modern Warfare supports this as well. If it does, expect an update to switch
 **TTA (True Audio)** to **WV (WavPack)** for 17 channel support as a
 `SPEAKER_BACK_CENTRE` would be nice...

@@ -131,9 +131,24 @@ function render {
 
 	# If there are any extra audio files, convert to FLAC and process
 	i=0
+	j=0
 	cmd=""
 	map=""
 	metadata=""
+
+	# If the 16 channel one was created, add that one in the mix after 7.1 mix
+	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+		printf \
+			"[%s]     %s Found Additional Audio Track: %s\n" \
+			"$(gettime)"                                     \
+			"[${yellow}EXTRA${normal}]"                      \
+			"16 Channel Master"
+
+		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
+		let "j++"
+		map="${map} -map ${j}:a"
+		metadata="${metadata} -metadata:s:a:${j} title=\"Game Audio [7.1.4.4 Master]\""
+	fi
 
 	while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
 		# Grab the title of the audio track from the ()'s
@@ -160,23 +175,10 @@ function render {
 
 		cmd="${cmd} -i \"${PR}/__AUDIO_tmp${i}.flac\""
 		let "i++"
-		map="${map} -map ${i}:a"
-		metadata="${metadata} -metadata:s:a:${i} title=\"${title}\""
+		let "j++"
+		map="${map} -map ${j}:a"
+		metadata="${metadata} -metadata:s:a:${j} title=\"${title}\""
 	done
-
-	# If the 16 channel one was created, add that one in the mix as last track
-	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
-		printf \
-			"[%s]     %s Found Additional Audio Track: %s\n" \
-			"$(gettime)"                                     \
-			"[${yellow}EXTRA${normal}]"                      \
-			"16 Channel Master"
-
-		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
-		let "i++"
-		map="${map} -map ${i}:a"
-		metadata="${metadata} -metadata:s:a:${i} title=\"Game Audio [16 Channel]\""
-	fi
 
 	# Append to the original file by making a copy, then overwriting
 	if [ $i -gt 0 ]; then
