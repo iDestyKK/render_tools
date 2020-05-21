@@ -101,6 +101,21 @@ part2/audio.wav
 **Each segment directory must only have one WAV file. More will result in the
 script terminating and detailing the error.**
 
+## Production Procedure
+1. Record your movie in VBA with the "Record New Movie" option. When you are
+   done, click "Stop Movie".
+
+2. Replay your movie back with "Play Movie". Make sure the game is paused
+   before you begin. Make a new directory in `queue`. In VBA-RR, go to "Start
+   AVI Recording" and record an AVI file to this new directory. Then, go to
+   "Start WAV Recording" and have it record a WAV file to the new directory.
+   Check the option "Pause at frame" and it'll fill in the last frame of the
+   replay for you. **Don't change anything.** Once both are setup, unpause the
+   emulator and let it record.
+
+3. When it is done, simply run `./render.sh` and let it do the hard work for
+   you. Your final MKV file will be placed in `processed`.
+
 ## Archival via `-a` option
 In `gameplay`, the `-a` option was for amplification of audio. Here, it's
 different... much more different.
