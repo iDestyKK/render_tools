@@ -27,6 +27,7 @@ normal=$(tput sgr 0)
 VCODEC="libx265"
 ACODEC="flac"
 CRF=17
+PRESET=slow
 ARCHIVE=0
 PIX_FMT="yuv420p10le"
 VERBOSE=0
@@ -323,6 +324,7 @@ for D in *; do
 			-map               1:a                           \
 			-c:v               ${VCODEC}                     \
 			-pix_fmt           ${PIX_FMT}                    \
+			-preset            ${PRESET}                     \
 			-crf               ${CRF}                        \
 			-x265-params       log-level=error               \
 			-c:a               ${ACODEC}                     \
@@ -348,6 +350,7 @@ for D in *; do
 			-map               1:a                           \
 			-c:v               ${VCODEC}                     \
 			-pix_fmt           ${PIX_FMT}                    \
+			-preset            ${PRESET}                     \
 			-crf               ${CRF}                        \
 			-x265-params       log-level=error               \
 			-c:a               ${ACODEC}                     \
