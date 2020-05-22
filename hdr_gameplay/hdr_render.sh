@@ -181,7 +181,7 @@ function render {
 	done
 
 	# Append to the original file by making a copy, then overwriting
-	if [ $i -gt 0 ]; then
+	if [ $j -gt 0 ]; then
 		printf \
 			"[%s]     %s Muxing Extra Audio Tracks...\n" \
 			"$(gettime)"                                 \
