@@ -1,0 +1,36 @@
+;FFMETADATA1
+title=Test Track License
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00.00, Ends at 03:21.89
+START=0
+END=201890
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 03:21.89, Ends at 07:36.06
+START=201890
+END=456060
+TITLE=Gameplay
+
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 07:36.06, Ends at 08:08.57
+START=456060
+END=488570
+TITLE=Level End
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 08:08.57, Ends at 10:23.61
+START=488570
+END=623610
+TITLE=NOSTRA\'s Introduction

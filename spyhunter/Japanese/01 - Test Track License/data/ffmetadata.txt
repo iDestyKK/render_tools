@@ -1,0 +1,42 @@
+;FFMETADATA1
+title=Test Track License
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# intro.mkv        - 3:44.53 - 224530 - 224530
+# mission.mkv      - 4:17.04 - 257040 - 481570
+# end_mov.mkv      - 0:08.65 -   8650 - 490220
+# clear.mkv        - 0:25.89 -  25890 - 516110
+# nostra_intro.mkv - 2:15.04 - 135040 - 651150
+
+# Starts at 00:00.00, Ends at 03:21.89
+START=0
+END=224530
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 03:21.89, Ends at 07:36.06
+START=224530
+END=481570
+TITLE=Gameplay
+
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 07:36.06, Ends at 08:08.57
+START=481570
+END=516110
+TITLE=Level End
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 08:08.57, Ends at 10:23.61
+START=516110
+END=651150
+TITLE=NOSTRA\'s Introduction
