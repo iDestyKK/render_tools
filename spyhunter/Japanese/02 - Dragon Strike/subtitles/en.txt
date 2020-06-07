@@ -1,0 +1,11 @@
+70.278929	71.864939	Mission Route Plotted
+92.988071	94.926528	First Objective Complete
+153.848255	155.663093	Approaching Weapons Van
+186.199708	188.188139	Warning: Missile Inventory Low
+230.134560	232.207157	Second Objective Complete
+238.864191	240.928898	Third Objective Complete
+250.523866	252.677999	Approaching renzevous location
+252.880524	254.587524	Missiles Launcher Empty
+254.634867	256.205096	Approaching Weapons Van
+256.205096	256.436554	Approaching Weapons Van (lol jk)
+274.169199	275.442215	Area Cleared
