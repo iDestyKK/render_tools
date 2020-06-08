@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Route Canal
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:31.48
+START=00
+END=31480
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:31.48, Ends at 00:03:26.44
+START=31480
+END=206440
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:03:26.44, Ends at 00:04:04.84
+START=206440
+END=244840
+TITLE=Level End
