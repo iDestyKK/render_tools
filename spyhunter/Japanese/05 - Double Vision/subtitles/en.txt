@@ -1,0 +1,8 @@
+83.781809	85.835700	First Objective Complete
+120.676550	122.810508	Warning: Missile Inventory Low
+166.098850	167.961276	Third Objective Complete
+222.963740	224.941045	Second Objective Complete
+225.443693	227.358338	Missiles Launcher Empty
+236.349686	238.601222	Approaching rendezvous location
+238.604848	240.342176	Approaching Weapons Boat
+256.124821	257.467683	Area Cleared

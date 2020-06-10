@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Double Vision
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:30.30
+START=00
+END=30300
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:30.30, Ends at 00:04:00.08
+START=30300
+END=240080
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:00.08, Ends at 00:04:26.26
+START=240080
+END=266260
+TITLE=Level End
