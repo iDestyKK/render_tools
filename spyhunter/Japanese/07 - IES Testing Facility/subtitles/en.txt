@@ -1,0 +1,8 @@
+86.279142	88.207136	Begin Operation
+175.859707	177.527574	First Objective Complete
+190.319152	192.140035	Second Objective Complete
+209.549939	211.738058	Fourth Objective Complete
+216.482015	218.205570	Warning: Gun Ammo Low
+241.487272	242.827492	Objective Complete
+242.827492	243.961374	Guns Empty
+283.898792	285.084661	Area Cleared

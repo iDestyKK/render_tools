@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=IES Testing Facility
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:28.01
+START=00
+END=28010
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:28.01, Ends at 00:04:24.88
+START=28010
+END=264880
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:24.88, Ends at 00:04:52.59
+START=264880
+END=292590
+TITLE=Level End
