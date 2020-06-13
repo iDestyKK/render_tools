@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Escort Service
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:40.86
+START=00
+END=40860
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:40.86, Ends at 00:03:59.11
+START=40860
+END=239110
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:03:59.11, Ends at 00:04:46.60
+START=239110
+END=286600
+TITLE=Level End
