@@ -1,0 +1,10 @@
+117.698725	119.435086	Approaching Weapons Van
+121.283605	123.065660	First Objective Complete
+205.281131	207.324887	Approaching Weapons Van
+237.250122	239.399804	Second Objective Complete
+241.082164	243.458238	Caution: Veer right ahead.
+246.540487	248.332927	Third Objective Complete
+252.102659	254.266880	Warning: Missile Inventory Low
+274.442736	276.768962	Approaching rendezvous location
+279.165806	281.298872	Fourth Objective Complete
+302.484144	303.800954	Area Cleared

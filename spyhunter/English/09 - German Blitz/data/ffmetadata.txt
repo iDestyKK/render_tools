@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=German Blitz
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:37.10
+START=00
+END=37100
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:37.10, Ends at 00:04:42.08
+START=37100
+END=282080
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:42.08, Ends at 00:05:17.72
+START=282080
+END=317720
+TITLE=Level End

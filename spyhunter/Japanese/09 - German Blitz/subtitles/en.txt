@@ -1,0 +1,12 @@
+121.090009	122.826370	Approaching Weapons Van
+124.738604	126.520659	First Objective Complete
+182.438256	185.064735	Caution: Inflicting Civilian Casualties
+208.928289	210.972045	Approaching Weapons Van
+218.184714	220.934441	Caution: Inflicting Civilian Casualties
+240.199533	242.349215	Second Objective Complete
+243.544256	245.920330	Caution: Veer right ahead.
+248.880087	250.672527	Third Objective Complete
+257.888951	260.053172	Warning: Missile Inventory Low
+277.549290	279.875516	Approaching rendezvous location
+282.245502	284.378568	Fourth Objective Complete
+306.379062	307.695872	Area Cleared
