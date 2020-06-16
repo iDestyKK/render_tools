@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=French Kiss
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:38.41
+START=00
+END=38410
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:38.41, Ends at 00:04:20.47
+START=38410
+END=260470
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:20.47, Ends at 00:04:55.63
+START=260470
+END=295630
+TITLE=Level End
