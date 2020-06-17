@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Locked Keys
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:41.26
+START=00
+END=41260
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:41.26, Ends at 00:04:21.53
+START=41260
+END=261530
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:21.53, Ends at 00:05:05.74
+START=261530
+END=305740
+TITLE=Level End

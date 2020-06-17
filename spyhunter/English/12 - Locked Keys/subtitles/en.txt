@@ -1,0 +1,7 @@
+78.073517	79.880257	System Check Complete
+165.692374	167.898834	Third Objective Complete
+180.178265	182.032971	Approaching Weapons Van
+232.605679	234.444396	First Objective Complete
+254.766215	257.228497	Approaching rendezvous location
+258.451643	260.554176	Second Objective Complete
+292.056192	293.335300	Area Cleared
