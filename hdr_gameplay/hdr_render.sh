@@ -35,11 +35,13 @@ CPRIM_BLU="B(7520,2978)"
 CPRIM_GRE="G(15332,31543)"
 CPRIM_WPT="WP(15674,16455)"
 LUMINANCE="L(14990000,100)"
+MAX_CLL=1499
+MAX_FALL=799
 
 # Ok... construct the string
 X265_P="colorprim=bt2020:colormatrix=bt2020nc:transfer=smpte2084"
 X265_P="${X265_P}:colormatrix=bt2020nc:hdr=1:info=1:repeat-headers=1"
-X265_P="${X265_P}:max-cll=0,0:master-display="
+X265_P="${X265_P}:max-cll=${MAX_CLL},${MAX_FALL}:master-display="
 X265_P="${X265_P}${CPRIM_GRE}${CPRIM_BLU}${CPRIM_RED}${CPRIM_WPT}${LUMINANCE}"
 
 # -----------------------------------------------------------------------------
