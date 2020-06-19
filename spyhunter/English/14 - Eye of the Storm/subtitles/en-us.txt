@@ -1,0 +1,27 @@
+87.626134	89.480656	System Check Complete
+112.570129	114.711010	Third Objective Complete
+173.063661	174.802275	Approaching Weapons Van
+201.529200	203.738262	Missile Launch Detected
+205.408695	207.515486	Missile Launch Detected
+211.258619	213.072232	Missile Launch Detected
+218.806249	220.551680	Missile Launch Detected
+220.551680	222.542564	Second Objective Complete
+319.025401	321.265145	Warning: Missile Inventory Low
+364.167997	365.736158	First Objective Complete
+365.981609	367.205457	Warning: Gun Ammo Low
+439.402250	444.740813	You know I put it in drive cause it makes me feel alive,
+444.740813	450.021427	the situation's awry and going faster.
+450.021417	452.717983	And now I'm hunting you down,
+452.717983	455.387266	Injecting fear from the sound
+455.387266	463.367844	And with my mayhem abound, I Am Your Master
+463.367844	466.429168	Come on and let the Hunt be the Hunted
+468.679139	471.379104	Come on and let the Hunt be the Hunted
+471.379104	474.027933	Come on and let the Hunt be the Hunted
+474.027933	476.536992	Come on and let the Hunt be the Hunted
+476.536992	479.335819	Get in my way and I'll be blowing up something
+479.335819	482.025557	Come on and let the Hunt be the Hunted
+482.025557	486.099367	I'm trying to make it to the other side
+486.099367	489.784547	And I'm dying to make my move
+489.784547	492.702691	And I'm dying to make my move (So get out of my way cause I'm coming for you)
+492.702691	499.455160	I know that you will have to realize the danger behi(nd you)
+505.841156	507.109322	Area Cleared
