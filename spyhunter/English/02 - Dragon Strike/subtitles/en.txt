@@ -1,0 +1,12 @@
+60.785146	62.342060	Mission Route Plotted
+83.886927	85.806617	First Objective Complete
+145.704977	147.327392	Approaching Weapons Van
+181.095798	183.443765	Warning: Missile Inventory Low
+222.301113	224.301420	Second Objective Complete
+230.745734	232.846812	Third Objective Complete
+238.772154	240.409685	Missiles Launcher Empty
+241.734825	243.629323	Warning: Machine Gun Ammo Low
+243.629323	245.846288	Approaching rendezvous location
+246.017598	248.132533	Approaching Weapons Van
+248.132533	248.666620	Approaching Weapons Van (lol nope)
+265.383380	266.621738	Area Cleared

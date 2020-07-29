@@ -1,0 +1,46 @@
+83.078971	84.957248	That's it. I'm coming out.
+85.421020	88.261624	Operation complete. Systems armed.
+88.870325	91.397883	Caution: Environment Hostile.
+162.731826	165.614459	Checking the memory card (PS2) in memory card slot 1. Please do not insert or remove the memory card (PS2) or turn the power on/off.
+165.614459	169.185504	There is no Spy Hunter data. Insert a memory card (PS2) with Spy Hunter data into the slot.
+175.021786	179.363852	Checking the memory card (PS2) in memory card slot 1. Please do not insert or remove the memory card (PS2) or turn the power on/off.
+179.363852	183.653744	Saving to the memory card (PS2) in memory card slot 1. Please do not insert or remove the memory card (PS2) or turn the power on/off.
+190.343656	192.256716	Warning: Wrong way.
+192.361064	196.882842	Checking the memory card (PS2) in memory card slot 1. Please do not insert or remove the memory card (PS2) or turn the power on/off.
+196.882842	199.577068	Saving to the memory card (PS2) in memory card slot 1. Please do not insert or remove the memory card (PS2) or turn the power on/off.
+276.074823	277.686431	Begin Operation
+329.269481	331.333267	Caution: Heavy Civilian Population
+360.646561	362.692955	First Objective Complete
+392.304802	394.496125	Second Objective Complete
+417.203566	419.018074	Fourth Objective Complete
+430.771798	432.516740	Fifth Objective Complete
+447.027009	448.386441	Objective Complete
+448.386441	450.503850	Initialising Vehicle Transition
+460.741619	462.176414	Approaching Weapons Van
+493.685916	494.946796	Area Cleared
+532.226288	533.965433	Good evening, gentlemen.
+537.182852	541.808979	You've been summoned here today to execute the final stage of Operation: Rebirth.
+548.362658	552.972842	So without further delay, it's time to start our new world.
+554.509087	556.787368	All stations are now fully operational.
+557.529403	561.767120	Petra, Venice, French Riviera,
+561.767120	566.903396	Germany, England, United States, and Panama.
+567.303399	570.746907	After each base has completed its operation, we will then meet in Petra
+570.746907	574.706361	where you shall all witness the launch of the Four Horsemen.
+577.538270	582.094830	Upon my command, the strategically placed satellites shall emit an electromagnetic
+582.094830	585.990516	pulse that will spread like much needed cure across the globe,
+585.990516	589.735475	leaving the earth cleansed, completely drained of power.
+590.202146	593.952903	Neither the deepest canyons nor the highest mountains shall be spared.
+594.706532	598.393520	Unfortunately, there is one precaution we must take.
+599.065990	604.231251	Our insiders tell us that IES is aware of our presence and has sent a spy to stop us.
+604.671835	607.054464	Normally, I wouldn't worry about a single spy,
+607.367510	609.553036	but I have reason to believe that this is the very man who
+609.553036	613.002341	crippled our endeavors in '83 and postponed our plans.
+613.773362	615.187867	This will not happen again!
+615.831350	618.753115	We will use our army of agents to eliminate him.
+619.999502	623.431415	Ignorant government agencies don't know who they are dealing with.
+623.547358	625.738681	They will soon understand that this will happen.
+626.095206	627.573480	It has been foretold.
+628.112615	630.651767	It is for the good of all humanity.
+631.045973	632.164823	That is all, gentlemen.
+638.756184	642.190996	When the Four Horsemen ride, darkness will blanket the Earth
+642.190996	645.333052	and a new king will rise from the ashes.

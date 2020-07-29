@@ -1,0 +1,11 @@
+63.338180	65.201486	System Check Complete
+109.735922	111.570780	Approaching Weapons Van
+152.023011	154.213463	Warning: Missile Inventory Low
+162.961044	164.938140	First Objective Complete
+186.906660	189.068664	Second Objective Complete
+208.754278	211.584797	Warning: Damage Level 50%
+215.126500	217.096484	Missiles Launcher Empty
+230.793917	232.522098	Third Objective Complete
+232.522098	234.157824	Police Roadblock Ahead
+234.157824	236.625638	Approaching rendezvous location
+260.559539	261.901012	Area Cleared

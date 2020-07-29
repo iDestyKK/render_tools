@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Terrorist Lock Down
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:43.74
+START=00
+END=43740
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:43.74, Ends at 00:04:24.18
+START=43740
+END=264180
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:24.18, Ends at 00:05:06.79
+START=264180
+END=306790
+TITLE=Level End

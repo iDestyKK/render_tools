@@ -1,0 +1,6 @@
+77.930714	79.858707	Begin Operation
+168.898334	170.566201	First Objective Complete
+184.368185	186.189068	Second Objective Complete
+202.959549	205.147669	Fourth Objective Complete
+234.909153	236.837146	Objective Complete
+277.594455	278.780324	Area Cleared

@@ -1,0 +1,15 @@
+85.663705	87.212171	System Check Complete
+101.749806	103.700569	Fourth Objective Complete
+127.560230	129.552740	Second Objective Complete
+152.984154	154.745154	Third Objective Complete
+174.937314	176.812172	Approaching Weapons Van
+212.358177	215.538603	Something just exploded onto the track!
+217.359478	218.972462	There's something on the track!
+219.523874	220.563010	What is he...
+220.575152	222.887228	He is racing the other cars!
+228.927402	231.389548	What is he... He's coming around the corner!
+231.412592	232.592918	There it is!
+233.515149	237.447036	In all my years of racing I've never seen anything like I've seen now!
+237.840076	239.802224	First Objective Complete
+257.497430	259.266021	Fifth Objective Complete
+278.236983	279.455261	Area Cleared

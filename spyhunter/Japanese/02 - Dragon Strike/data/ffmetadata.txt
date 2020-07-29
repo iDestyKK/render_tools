@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Dragon Strike
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00.00, Ends at 00:28.33
+START=0
+END=28330
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:28.33, Ends at 04:17.91
+START=28330
+END=257910
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 04:17.91, Ends at 04:55.45
+START=257910
+END=295450
+TITLE=Level End

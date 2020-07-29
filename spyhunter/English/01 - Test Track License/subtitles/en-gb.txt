@@ -1,0 +1,40 @@
+84.630003	86.832580	That's it. I'm coming out.
+86.965734	89.911750	Operation complete. Systems armed.
+90.444363	93.064431	Caution. Environment Hostile.
+182.020529	183.651656	Missiles Launcher Empty
+251.859350	253.590343	Begin Operation
+304.020428	306.201059	Caution: Heavy Civilian Population
+335.379940	337.324532	First Objective Complete
+366.578261	368.633815	Second Objective Complete
+390.482736	392.391266	Fourth Objective Complete
+404.087170	405.879191	Fifth Objective Complete
+420.101395	421.382995	Objective Complete
+421.398975	423.756898	Initialising Vehicle Transition
+433.858960	435.492862	Approaching Weapons Van
+466.885781	468.189573	Area Cleared
+498.362659	499.827345	Good evening, gentlemen.
+503.339831	507.975230	You've been summoned here today to execute the final stage of Operation: Rebirth.
+514.116924	519.470796	So without further delay, it's time to start our new world.
+520.646983	522.605446	All stations are now fully operational.
+523.728927	528.014798	Petra, Venice, French Riviera,
+528.014798	533.296544	Germany, England, United States, and Panama.
+533.296544	536.952711	After each base has completed its operation, we will then meet in Petra
+536.952711	540.708743	where you shall all witness the launch of the Four Horsemen.
+543.737980	548.237452	Upon my command, the strategically placed satellites shall send an electromagnetic
+548.237452	552.182117	pulse that will spread like much needed cure across the globe,
+552.182117	556.282129	leaving the earth cleansed, completely drained of power.
+556.282129	560.443169	Neither the deepest canyons nor the highest mountains shall be spared.
+560.931397	564.487699	Unfortunately, there is one precaution we must take.
+565.228364	570.290963	Our insiders tell us that IES is aware of our presence and has sent a spy to stop us.
+570.830511	573.421452	Normally, I wouldn't worry about a single spy,
+573.543509	575.820985	but I have reason to believe that this is the very man who
+575.820985	579.185879	crippled our endeavors in '83 and postponed our plans.
+579.952898	581.417584	This will not happen again!
+582.027869	584.749190	We will use our army of agents to eliminate him.
+586.147299	589.648120	Ignorant government agencies don't know who they are dealing with.
+589.736889	592.183581	They will soon understand that this will happen.
+592.247383	593.920121	It has been foretold.
+594.302937	596.341847	It is for the good of all humanity.
+597.223987	599.054845	That is all, gentlemen.
+604.902493	608.357543	When the Four Horsemen ride, darkness will blank the Earth
+608.357543	611.800110	and a new king will rise from the ashes.

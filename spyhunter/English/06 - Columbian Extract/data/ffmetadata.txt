@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Columbian Extract
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:31.63
+START=00
+END=31630
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:31.63, Ends at 00:04:33.04
+START=31630
+END=273040
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:33.04, Ends at 00:05:12.49
+START=273040
+END=312490
+TITLE=Level End

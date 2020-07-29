@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Swamp Venom
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:28.23
+START=00
+END=28230
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:28.23, Ends at 00:04:00.54
+START=28230
+END=240540
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:04:00.54, Ends at 00:04:31.97
+START=240540
+END=271970
+TITLE=Level End

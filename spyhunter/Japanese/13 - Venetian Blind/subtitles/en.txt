@@ -1,0 +1,9 @@
+80.172878	81.845581	System Check Complete
+125.367018	127.515798	First Objective Complete
+139.144112	140.881150	Approaching Weapons Boat
+157.917874	159.493340	Warning: Gun Ammo Low
+172.657386	174.555261	Third Objective Complete
+192.835225	195.041906	Second Objective Complete
+198.820680	200.930067	Approaching rendezvous location
+200.943275	202.208922	Guns Empty
+234.018599	235.408229	Area Cleared

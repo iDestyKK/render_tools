@@ -1,0 +1,27 @@
+;FFMETADATA1
+title=Venetian Blind
+artist=iDestyKK
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:00.00, Ends at 00:00:40.66
+START=00
+END=40660
+TITLE=Intro
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:00:40.66, Ends at 00:03:24.72
+START=40660
+END=204720
+TITLE=Gameplay
+
+[CHAPTER]
+TIMEBASE=1/1000
+
+# Starts at 00:03:24.72, Ends at 00:04:12.13
+START=204720
+END=252130
+TITLE=Level End
