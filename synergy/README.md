@@ -10,7 +10,7 @@ information file are attached to the final MKV file for the ultimate archiving
 solution.
 
 ## Preview
-![Screenshot](../../../assets/synergy/preview.png)
+![Screenshot](https://github.com/iDestyKK/render_tools/blob/assets/synergy/preview.png)
 
 ## Utilities
 In this directory, there's some bash scripts which need to be used for a final
@@ -145,4 +145,4 @@ restore DirectSound3D functionality. Afterwards, in Synergy, open up the
 console and type `snd_legacy_surround 1`. Then, enable `7.1 Speakers` in the
 audio settings. The LFE channel is silent. Bummer. 7.1 would've been nice.
 
-![Waveforms in Audacity](../../../assets/synergy/7.0_waveform.png)
+![Waveforms in Audacity](https://github.com/iDestyKK/render_tools/blob/assets/synergy/7.0_waveform.png)
