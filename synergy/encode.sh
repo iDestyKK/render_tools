@@ -69,7 +69,7 @@ P4_DELAY_MS=$(echo $P4_DELAY | awk '{ printf "%d", $1*1000 }')
 T_LIMIT="${13}"
 
 # Begin constructing the filter_complex string
-SCALEF="scale=1600:-1"
+SCALEF="scale=1600:-1,fps=60"
 
 # Input parameters
 F_P1_IN="[1:v]${SCALEF}[pov1]"
@@ -187,20 +187,28 @@ rm "p1.dem" "p2.dem" "p3.dem" "p4.dem"
 if [ $# -eq 14 ]; then
 	# 14 arguments given. Use the audio files from the AVI source.
 	ADELAY_STR=""
-	ADELAY_STR="${ADELAY_STR} [1:1] ${ABE}${P1_DELAY_MS}${AFT} [D1][O1];"
-	ADELAY_STR="${ADELAY_STR} [2:1] ${ABE}${P2_DELAY_MS}${AFT} [D2][O2];"
-	ADELAY_STR="${ADELAY_STR} [3:1] ${ABE}${P3_DELAY_MS}${AFT} [D3][O3];"
-	ADELAY_STR="${ADELAY_STR} [4:1] ${ABE}${P4_DELAY_MS}${AFT} [D4][O4];"
+	ADELAY_STR="${ADELAY_STR} [5:0] ${ABE}${P1_DELAY_MS}${AFT} [D1][O1];"
+	ADELAY_STR="${ADELAY_STR} [6:0] ${ABE}${P2_DELAY_MS}${AFT} [D2][O2];"
+	ADELAY_STR="${ADELAY_STR} [7:0] ${ABE}${P3_DELAY_MS}${AFT} [D3][O3];"
+	ADELAY_STR="${ADELAY_STR} [8:0] ${ABE}${P4_DELAY_MS}${AFT} [D4][O4];"
 	ADELAY_STR="${ADELAY_STR} [D1][D2][D3][D4] amix=inputs=4 [outa]"
 
 	# Watch this...
 	ffmpeg \
 		-r                 60                                        \
 		-i                 "${BG}"                                   \
-		-itsoffset         ${P1_DELAY} -i "${F_P1}"                  \
-		-itsoffset         ${P2_DELAY} -i "${F_P2}"                  \
-		-itsoffset         ${P3_DELAY} -i "${F_P3}"                  \
-		-itsoffset         ${P4_DELAY} -i "${F_P4}"                  \
+		-framerate         60 \
+		-itsoffset         ${P1_DELAY} -i "${F_P1}/frame%04d.tga"    \
+		-framerate         60 \
+		-itsoffset         ${P2_DELAY} -i "${F_P2}/frame%04d.tga"    \
+		-framerate         60 \
+		-itsoffset         ${P3_DELAY} -i "${F_P3}/frame%04d.tga"    \
+		-framerate         60 \
+		-itsoffset         ${P4_DELAY} -i "${F_P4}/frame%04d.tga"    \
+		-i                 "${F_P1}/frame.flac"                      \
+		-i                 "${F_P2}/frame.flac"                      \
+		-i                 "${F_P3}/frame.flac"                      \
+		-i                 "${F_P4}/frame.flac"                      \
 		-attach            "demos.tar.xz"                            \
 		-attach            "info.json"                               \
 		-filter_complex    "${INPUT_STR}${OUTPUT_STR};${ADELAY_STR}" \
