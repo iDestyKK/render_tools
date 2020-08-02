@@ -27,16 +27,15 @@
 # -----------------------------------------------------------------------------
 
 # If you passed in no parameters, you don't know what you're doing.
-if [ $# -ne 14 ] && [ $# -ne 18 ]; then
+if [ $# -ne 14 ]; then
 	printf \
-		"usage: %s %s %s %s %s %s [%s] %s\n"      \
-			"$0"                                  \
-			"p1_avi p1_delay p1_dem"              \
-			"p2_avi p2_delay p2_dem"              \
-			"p3_avi p3_delay p3_dem"              \
-			"p4_avi p4_delay p4_dem"              \
-			"duration"                            \
-			"p1_audio p2_audio p3_audio p4_audio" \
+		"usage: %s %s %s %s %s %s %s\n" \
+			"$0"                        \
+			"p1_avi p1_delay p1_dem"    \
+			"p2_avi p2_delay p2_dem"    \
+			"p3_avi p3_delay p3_dem"    \
+			"p4_avi p4_delay p4_dem"    \
+			"duration"                  \
 			"output_mkv"
 	exit 1
 fi
@@ -183,105 +182,60 @@ rm "p1.dem" "p2.dem" "p3.dem" "p4.dem"
 # MKV Encoding                                                             {{{1
 # -----------------------------------------------------------------------------
 
-# Based on arguments given, construct the final MKV deliverable
-if [ $# -eq 14 ]; then
-	# 14 arguments given. Use the audio files from the AVI source.
-	ADELAY_STR=""
-	ADELAY_STR="${ADELAY_STR} [5:0] ${ABE}${P1_DELAY_MS}${AFT} [D1][O1];"
-	ADELAY_STR="${ADELAY_STR} [6:0] ${ABE}${P2_DELAY_MS}${AFT} [D2][O2];"
-	ADELAY_STR="${ADELAY_STR} [7:0] ${ABE}${P3_DELAY_MS}${AFT} [D3][O3];"
-	ADELAY_STR="${ADELAY_STR} [8:0] ${ABE}${P4_DELAY_MS}${AFT} [D4][O4];"
-	ADELAY_STR="${ADELAY_STR} [D1][D2][D3][D4] amix=inputs=4 [outa]"
+# Construct the final MKV deliverable
 
-	# Watch this...
-	ffmpeg \
-		-r                 60                                        \
-		-i                 "${BG}"                                   \
-		-framerate         60 \
-		-itsoffset         ${P1_DELAY} -i "${F_P1}/frame%04d.tga"    \
-		-framerate         60 \
-		-itsoffset         ${P2_DELAY} -i "${F_P2}/frame%04d.tga"    \
-		-framerate         60 \
-		-itsoffset         ${P3_DELAY} -i "${F_P3}/frame%04d.tga"    \
-		-framerate         60 \
-		-itsoffset         ${P4_DELAY} -i "${F_P4}/frame%04d.tga"    \
-		-i                 "${F_P1}/frame.flac"                      \
-		-i                 "${F_P2}/frame.flac"                      \
-		-i                 "${F_P3}/frame.flac"                      \
-		-i                 "${F_P4}/frame.flac"                      \
-		-attach            "demos.tar.xz"                            \
-		-attach            "info.json"                               \
-		-filter_complex    "${INPUT_STR}${OUTPUT_STR};${ADELAY_STR}" \
-		-map               "[v4]"                                    \
-		-map               "[outa]"                                  \
-		-map               "[O1]"                                    \
-		-map               "[O2]"                                    \
-		-map               "[O3]"                                    \
-		-map               "[O4]"                                    \
-		-metadata:s:a:0    title="Game Audio - All"                  \
-		-metadata:s:a:1    title="Game Audio - DKK"                  \
-		-metadata:s:a:2    title="Game Audio - SKK"                  \
-		-metadata:s:a:3    title="Game Audio - D4"                   \
-		-metadata:s:a:4    title="Game Audio - Django"               \
-		-metadata:s:t:0    mimetype="application/x-gtar"             \
-		-metadata:s:t:1    mimetype="application/json"               \
-		-metadata          DATE_ENCODED="${DATE_ENC}"                \
-		-t                 "${T_LIMIT}"                              \
-		-c:v               libx265                                   \
-		-crf               17                                        \
-		-pix_fmt           yuv420p10le                               \
-		-c:a               flac                                      \
-		-compression_level 12                                        \
-		"${14}"
-else
-	# 18 arguments given. Manual audio files have been given.
-	ADELAY_STR=""
-	ADELAY_STR="${ADELAY_STR} [5:0] ${ABE}${P1_DELAY_MS}${AFT} [D1][O1];"
-	ADELAY_STR="${ADELAY_STR} [6:0] ${ABE}${P2_DELAY_MS}${AFT} [D2][O2];"
-	ADELAY_STR="${ADELAY_STR} [7:0] ${ABE}${P3_DELAY_MS}${AFT} [D3][O3];"
-	ADELAY_STR="${ADELAY_STR} [8:0] ${ABE}${P4_DELAY_MS}${AFT} [D4][O4];"
-	ADELAY_STR="${ADELAY_STR} [D1][D2][D3][D4] amix=inputs=4 [outa]"
+# Construct audio delay filter via "adelay"
+ADELAY_STR=""
+ADELAY_STR="${ADELAY_STR} [5:0] ${ABE}${P1_DELAY_MS}${AFT} [D1][O1];"
+ADELAY_STR="${ADELAY_STR} [6:0] ${ABE}${P2_DELAY_MS}${AFT} [D2][O2];"
+ADELAY_STR="${ADELAY_STR} [7:0] ${ABE}${P3_DELAY_MS}${AFT} [D3][O3];"
+ADELAY_STR="${ADELAY_STR} [8:0] ${ABE}${P4_DELAY_MS}${AFT} [D4][O4];"
+ADELAY_STR="${ADELAY_STR} [D1][D2][D3][D4] amix=inputs=4 [outa]"
 
-	# Watch this...
-	ffmpeg \
-		-r                 60                                        \
-		-i                 "${BG}"                                   \
-		-itsoffset         ${P1_DELAY} -i "${F_P1}"                  \
-		-itsoffset         ${P2_DELAY} -i "${F_P2}"                  \
-		-itsoffset         ${P3_DELAY} -i "${F_P3}"                  \
-		-itsoffset         ${P4_DELAY} -i "${F_P4}"                  \
-		-i                 "${14}"                                   \
-		-i                 "${15}"                                   \
-		-i                 "${16}"                                   \
-		-i                 "${17}"                                   \
-		-attach            "demos.tar.xz"                            \
-		-attach            "info.json"                               \
-		-filter_complex    "${INPUT_STR}${OUTPUT_STR};${ADELAY_STR}" \
-		-map               "[v4]"                                    \
-		-map               "[outa]"                                  \
-		-map               "[O1]"                                    \
-		-map               "[O2]"                                    \
-		-map               "[O3]"                                    \
-		-map               "[O4]"                                    \
-		-metadata:s:a:0    title="Game Audio - All"                  \
-		-metadata:s:a:1    title="Game Audio - DKK"                  \
-		-metadata:s:a:2    title="Game Audio - SKK"                  \
-		-metadata:s:a:3    title="Game Audio - D4"                   \
-		-metadata:s:a:4    title="Game Audio - Django"               \
-		-metadata:s:t:0    mimetype="application/x-gtar"             \
-		-metadata:s:t:1    mimetype="application/json"               \
-		-metadata          DATE_ENCODED="${DATE_ENC}"                \
-		-t                 "${T_LIMIT}"                              \
-		-c:v               libx265                                   \
-		-crf               17                                        \
-		-pix_fmt           yuv420p10le                               \
-		-c:a               flac                                      \
-		-compression_level 12                                        \
-		"${18}"
-fi
+# Now show me what you can really do...
+ffmpeg \
+	-r                 60                                        \
+	-i                 "${BG}"                                   \
+	-framerate         60                                        \
+	-itsoffset         ${P1_DELAY} -i "${F_P1}/frame%04d.tga"    \
+	-framerate         60                                        \
+	-itsoffset         ${P2_DELAY} -i "${F_P2}/frame%04d.tga"    \
+	-framerate         60                                        \
+	-itsoffset         ${P3_DELAY} -i "${F_P3}/frame%04d.tga"    \
+	-framerate         60                                        \
+	-itsoffset         ${P4_DELAY} -i "${F_P4}/frame%04d.tga"    \
+	-i                 "${F_P1}/frame.flac"                      \
+	-i                 "${F_P2}/frame.flac"                      \
+	-i                 "${F_P3}/frame.flac"                      \
+	-i                 "${F_P4}/frame.flac"                      \
+	-attach            "demos.tar.xz"                            \
+	-attach            "info.json"                               \
+	-filter_complex    "${INPUT_STR}${OUTPUT_STR};${ADELAY_STR}" \
+	-map               "[v4]"                                    \
+	-map               "[outa]"                                  \
+	-map               "[O1]"                                    \
+	-map               "[O2]"                                    \
+	-map               "[O3]"                                    \
+	-map               "[O4]"                                    \
+	-metadata:s:a:0    title="Game Audio - All"                  \
+	-metadata:s:a:1    title="Game Audio - DKK"                  \
+	-metadata:s:a:2    title="Game Audio - SKK"                  \
+	-metadata:s:a:3    title="Game Audio - D4"                   \
+	-metadata:s:a:4    title="Game Audio - Django"               \
+	-metadata:s:t:0    mimetype="application/x-gtar"             \
+	-metadata:s:t:1    mimetype="application/json"               \
+	-metadata          DATE_ENCODED="${DATE_ENC}"                \
+	-t                 "${T_LIMIT}"                              \
+	-c:v               libx265                                   \
+	-crf               17                                        \
+	-pix_fmt           yuv420p10le                               \
+	-c:a               flac                                      \
+	-compression_level 12                                        \
+	"${14}"
 
 # -----------------------------------------------------------------------------
 # Cleanup                                                                  {{{1
 # -----------------------------------------------------------------------------
 
+# Mandatory attachments for the MKV deliverable
 rm "info.json" "demos.tar.xz"
