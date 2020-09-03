@@ -21,6 +21,7 @@ If I haven't made the tools/scripts for a section public yet, the
 | source-tga         | n/a                | TGA Frames-\>MKV for recordings exported from Source Engine games. |
 | spyhunter          | dev/spyhunter      | Workspace for 4K SpyHunter (PS2 Reboot) gameplay project for DERPGProductions on YouTube. All scripts, and some assets are included. No video or audio files though. |
 | synergy            | dev/synergy        | Scripts for dealing with Synergy (HL2 Co-op Mod) Gameplay. Quad POV. 2x2 split-screen. |
+| zoom               | dev/zoom           | Scripts for dealing with Zoom recordings in a VERY specific format. |
 
 ## Setup
 Each of these have their own specific setup requirements. But I try to make
