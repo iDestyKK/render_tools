@@ -71,3 +71,45 @@ is second only to **8.1.4.4** in terms of spatial sound formats. Supposedly
 Modern Warfare supports this as well. If it does, expect an update to switch
 **TTA (True Audio)** to **WV (WavPack)** for 17 channel support as a
 `SPEAKER_BACK_CENTRE` would be nice...
+
+## Additional Metadata
+MKV files allow for `DATE_ENCODED` and `DATE_RECORDED` tags. `hdr_render.sh`
+will grab this metadata with nanosecond precision to store in the file. It's
+completely overkill, but it's nice to have the exact moment when the recording
+started preserved.
+
+An FFmpeg output for an MKV file will contain the following metadata:
+
+```
+Input #0, matroska,webm, from 'ModernWarfare 2021-01-31 00-20-59-932.mkv':
+  Metadata:
+    ISRC            : ...stuff...
+    DATE_RECORDED   : 2021-01-31T00:20:59.969497700-05:00
+    DATE_ENCODED    : 2021-01-31T18:44:57.483873000-05:00
+    ENCODER         : Lavf58.42.102
+  Duration: 00:07:03.66, start: 0.000000, bitrate: 29685 kb/s
+    Stream #0:0: Video: hevc (Main 10), yuv420p10le(tv, bt2020nc/bt2020/smpte2084, progressive), 2560x1080, 60 fps, 60 tbr, 1k tbn, 60 tbc (default)
+```
+
+### Additional scripts
+The metadata stored in these MKV files can also be used to rename the file in a
+more compact way. On my server, files are normally named
+`[YYYY-MM-DD - HH MM] MAP_NAME.mkv`. There's two scripts available which will
+assist in this:
+
+1. `mw_fix_stat.sh` - Grabs `DATE_ENCODED` and sets the file's modified date to
+   it.
+
+2. `mw_rename_from_dxtory.sh` - Grabs `DATE_RECORDED` and renames the file into
+   `[YYYY-MM-DD - HH MM].mkv`. You are expected to put in the map name after
+   the `]` character of the filename manually.
+
+Both of these scripts search for MKV files that begin with `ModernWarfare`. On
+my end, the following order is recommended for executing these:
+
+```bash
+UNIX> ./mw_fix_stat.sh; ./mw_rename_from_dxtory.sh
+```
+
+Your MKV deliverables will have their modified date fixed, and then renamed
+accordingly.

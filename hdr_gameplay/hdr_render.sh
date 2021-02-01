@@ -58,7 +58,7 @@ function gettime {
 function gettime_mkv {
 	OIFS=$IFS
 	IFS=$'\n'
-	printf $(date +%Y-%m-%d\ %H:%M:%S)
+	printf $(date +%Y-%m-%dT%H:%M:%S.%N%:z)
 	IFS=$OIFS
 }
 
@@ -73,7 +73,7 @@ function render {
 	# Timestamps
 	DATE_REC=$(stat "$F" \
 		| grep "Birth: " \
-		| sed 's/.*: \(.*-.*-.* .*:.*:.*\..*\) .*/\1/'
+		| sed 's/.*: \(.*-.*-.*\) \(.*:.*:.*\..*\) \(.*\)\(..\)$/\1T\2\3:\4/'
 	)
 
 	DATE_ENC=$(gettime_mkv)
