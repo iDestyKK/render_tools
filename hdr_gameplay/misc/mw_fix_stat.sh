@@ -5,11 +5,10 @@ for F in ModernWarfare*.mkv; do
 		ffmpeg -i "$F" \
 			2>&1 \
 			| grep "DATE_ENCODED" \
-			| sed 's/^.*: 20\(.*-.*-.*\) \(.*:.*\):\([0-9][0-9]\).*$/\1\2.\3/' \
-			| sed 's/[-:]//g'
+			| sed 's/^.*: \(20.*\)$/\1/'
 	)
 
-	touch -m -t "$FDATE" "$F"
+	touch -m --date="$FDATE" "$F"
 
 	RES=$?
 
