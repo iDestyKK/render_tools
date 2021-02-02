@@ -89,17 +89,32 @@ function render {
 
 		# Render with a 7.1 track generated instead. This mix is generated from
 		# the 16 channels being "flattened" into 8 via:
-		#     FL = c00 + c08 + c12
-		#     FR = c01 + c09 + c13
-		#     BL = c04 + c10 + c14
-		#     BR = c05 + c11 + c15
+		#     FL  = FL + (TFL / 2) + (BFL / 2)
+		#     FR  = FR + (TFR / 2) + (BFR / 2)
+		#     FC  = FC + (TFL / 4) + (TFR / 4) + (BFL / 4) + (BFR / 4)
+		#     LFE = LFE
+		#     BL  = BL + (TBL / 2) + (BBL / 2)
+		#     BR  = BR + (TBR / 2) + (BBR / 2)
+		#     SL  = SL + (TBL / 2) + (BBL / 2) + (TFL / 4) + (BFL / 4)
+		#     SR  = SR + (TBR / 2) + (BBR / 2) + (TFR / 4) + (BFR / 4)
+
+		C0="c0=c0 + 0.5 * c8 + 0.5 * c12"
+		C1="c1=c1 + 0.5 * c9 + 0.5 * c13"
+		C2="c2=c2 + 0.25 * c8 + 0.25 * c12 + 0.25 * c9 + 0.25 * c13"
+		C3="c3=c3"
+		C4="c4=c4 + 0.5 * c10 + 0.5 * c14"
+		C5="c5=c5 + 0.5 * c11 + 0.5 * c15"
+		C6="c6=c6 + 0.5 * c10 + 0.5 * c14 + 0.25 * c8 + 0.25 * c12"
+		C7="c7=c7 + 0.5 * c11 + 0.5 * c15 + 0.25 * c9 + 0.25 * c13"
+
+		CH_MAP="$C0|$C1|$C2|$C3|$C4|$C5|$C6|$C7"
 
 		ffmpeg \
 			-i "${F}"                                                         \
 			-i "$SRAW"                                                        \
 			-pix_fmt yuv420p10le                                              \
 			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
-			-filter_complex "[1:a]pan=7.1|c0=c0+c8+c12|c1=c1+c9+c13|c2=c2|c3=c3|c4=c4+c10+c14|c5=c5+c11+c15|c6=c6|c7=c7[a]" \
+			-filter_complex "[1:a]pan=7.1|$CH_MAP[a]" \
 			-c:v libx265                                                      \
 			-preset medium                                                    \
 			-crf 16                                                           \
