@@ -79,16 +79,29 @@ function render {
 	DATE_ENC=$(gettime_mkv)
 
 	# Detect a 16 channel audio file and process accordingly if so
-	SRAW="${F/.avi/ (16ch).wav}"
+	SRAW="${F/.avi/ (16ch).tta}"
+	WRAW="${F/.avi/ (16ch).wav}"
+
+	# Handle the generation of the temporary compressed 16 channel file
 	if [ -e "$SRAW" ]; then
+		# Simply copy the file over. It's already compressed.
+		cp "$SRAW" "${PR}/__AUDIO_tmp_16ch.tta"
+	elif [ -e "$WRAW" ]; then
 		# Generate 16-channel TTA (True Audio) track.
 		ffmpeg \
-			-i "$SRAW" \
+			-i "$WRAW" \
 			-c:a tta   \
 			"${PR}/__AUDIO_tmp_16ch.tta"
+	fi
 
-		# Render with a 7.1 track generated instead. This mix is generated from
-		# the 16 channels being "flattened" into 8 via:
+	# Encode video
+	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+		#
+		# A 16 channel (7.1.4.4) audio track was provided. Ensure that the
+		# first track is a 7.1 track via generating it from the 16 channel
+		# audio. A 7.1 mix can be generated via "flattening" the original mix
+		# into 8 channels via:
+		#
 		#     FL  = FL + (TFL / 2) + (BFL / 2)
 		#     FR  = FR + (TFR / 2) + (BFR / 2)
 		#     FC  = FC + (TFL / 4) + (TFR / 4) + (BFL / 4) + (BFR / 4)
@@ -97,6 +110,7 @@ function render {
 		#     BR  = BR + (TBR / 2) + (BBR / 2)
 		#     SL  = SL + (TBL / 2) + (BBL / 2) + (TFL / 4) + (BFL / 4)
 		#     SR  = SR + (TBR / 2) + (BBR / 2) + (TFR / 4) + (BFR / 4)
+		#
 
 		C0="c0=c0 + 0.5 * c8 + 0.5 * c12"
 		C1="c1=c1 + 0.5 * c9 + 0.5 * c13"
@@ -111,7 +125,7 @@ function render {
 
 		ffmpeg \
 			-i "${F}"                                                         \
-			-i "$SRAW"                                                        \
+			-i "${PR}/__AUDIO_tmp_16ch.tta"                                   \
 			-pix_fmt yuv420p10le                                              \
 			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
 			-filter_complex "[1:a]pan=7.1|$CH_MAP[a]" \
@@ -128,6 +142,11 @@ function render {
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
 	else
+		#
+		# No 16 channel audio was provided. So just encode with whatever is in
+		# the first audio track.
+		#
+
 		ffmpeg \
 			-i "${F}"                                                         \
 			-pix_fmt yuv420p10le                                              \
@@ -162,7 +181,9 @@ function render {
 			"16 Channel Master"
 
 		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
+
 		let "j++"
+
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"Game Audio [7.1.4.4 Master]\""
 	fi
@@ -191,8 +212,10 @@ function render {
 			"${PR}/__AUDIO_tmp${i}.flac"
 
 		cmd="${cmd} -i \"${PR}/__AUDIO_tmp${i}.flac\""
+
 		let "i++"
 		let "j++"
+
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"${title}\""
 	done
@@ -210,11 +233,13 @@ function render {
 
 		# Cleanup and Overwrite
 		rm -f "${PR}/__AUDIO_tmp"*".flac" "${PR}/__AUDIO_tmp_16ch.tta"
+
 		mv \
 			"${PR}/tmp.mkv" \
 			"${PR}/__RENDER.mkv"
 		echo ""
 	fi
+
 	mv "${PR}/__RENDER.mkv" "${PR}/${MKV_F}"
 }
 
