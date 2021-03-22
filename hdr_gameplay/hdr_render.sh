@@ -144,6 +144,7 @@ function render {
 			-map "[a]"                                                        \
 			-metadata:s:a:0 title="Game Audio [7.1 Surround]"                 \
 			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 title="Game Video"                                \
 			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
@@ -168,6 +169,7 @@ function render {
 			-map 0:1                                                          \
 			-metadata:s:a:0 title="Game Audio"                                \
 			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 title="Game Video"                                \
 			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
