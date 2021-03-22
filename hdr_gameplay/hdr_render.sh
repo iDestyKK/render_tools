@@ -25,6 +25,11 @@ SPATH=$(dirname "$SCRIPT")
 UTIL="${SPATH}/../util"
 PR="${SPATH}/processed"
 
+# Video Language Metadata (ISO 639-2)
+GV_LANG="jpn" # Game Video Language
+GA_LANG="jpn" # Game Audio Language
+VC_LANG="eng" # Voice Chat Language
+
 # -----------------------------------------------------------------------------
 # 2. Construct HDR x265 param string                                       {{{1
 # -----------------------------------------------------------------------------
@@ -138,6 +143,8 @@ function render {
 			-map 0:v                                                          \
 			-map "[a]"                                                        \
 			-metadata:s:a:0 title="Game Audio [7.1 Surround]"                 \
+			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
@@ -160,6 +167,8 @@ function render {
 			-map 0:v                                                          \
 			-map 0:1                                                          \
 			-metadata:s:a:0 title="Game Audio"                                \
+			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
@@ -186,6 +195,7 @@ function render {
 
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"Game Audio [7.1.4.4 Master]\""
+		metadata="${metadata} -metadata:s:a:${j} language=\"${GA_LANG}\""
 	fi
 
 	while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
@@ -218,6 +228,7 @@ function render {
 
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"${title}\""
+		metadata="${metadata} -metadata:s:a:${j} language=\"${VC_LANG}\""
 	done
 
 	# Append to the original file by making a copy, then overwriting
