@@ -272,10 +272,9 @@ function render {
 				"[${yellow}EXTRA${normal}]"                      \
 				"$title"
 
-			cp "${F/.avi/} st${k} ("*").txt" "__SUBTITLE_tmp${k}.txt"
-			cstr="${cstr} \"__SUBTITLE_tmp${k}.txt\""
+			cstr="${cstr} \"$(echo "${F/.avi/} st${k} ("*").txt")\""
 
-			${TDIR}/txt2srt "__SUBTITLE_tmp${k}.txt" \
+			${TDIR}/txt2srt "${F/.avi/} st${k} ("*").txt" \
 				> "${PR}/__SUBTITLE_tmp${k}.srt"
 
 			let "k++"
@@ -297,9 +296,6 @@ function render {
 
 				# Generate the SRT that has everything
 				eval "${TDIR}/txt2srt ${cstr} > \"${PR}/__SUBTITLE_tmp_C.srt\""
-
-				# Clean up
-				rm "__SUBTITLE_tmp"*".txt"
 
 				k=0
 				l=$j
@@ -350,6 +346,14 @@ function render {
 			printf "\n"
 
 			j=$l
+
+			# Create a TAR archive of the raw Audacity label files
+			eval "tar --transform 's/.*\///g' -cJvf \"${PR}/subtitle_txt.tar.xz\" ${cstr}"
+
+			# Add that into the metadata and include statements
+			cmd="${cmd} -attach \"${PR}/subtitle_txt.tar.xz\""
+			metadata="${metadata} -metadata:s:t:0 title=\"Subtitle Raws (Audacity Labels)\""
+			metadata="${metadata} -metadata:s:t:0 mimetype=\"application/x-gtar\""
 		fi
 	fi
 
@@ -368,7 +372,8 @@ function render {
 		rm -f \
 			"${PR}/__AUDIO_tmp"*".flac" \
 			"${PR}/__AUDIO_tmp_16ch.tta" \
-			"${PR}/__SUBTITLE_tmp"*".srt"
+			"${PR}/__SUBTITLE_tmp"*".srt" \
+			"${PR}/subtitle_txt.tar.xz"
 
 		# Overwrite
 		mv \
