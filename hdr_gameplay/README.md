@@ -97,7 +97,7 @@ It's a very simple format. Data is separated by tabs (`\t`) and newlines
 (`\n`). Generating an SRT subtitle file from this is done easily via
 `tools/txt2srt.cpp`.
 
-### Additional "All in one" track
+### Additional "All-in-one" track
 
 If multiple subtitle files are present, an additional subtitle track will be
 generated, `Voice - All`, which combines all other `txt` files together in a
