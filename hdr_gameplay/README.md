@@ -72,6 +72,36 @@ Modern Warfare supports this as well. If it does, expect an update to switch
 **TTA (True Audio)** to **WV (WavPack)** for 17 channel support as a
 `SPEAKER_BACK_CENTRE` would be nice...
 
+## Subtitle Tracks
+MKV allows for subtitle tracks as well. Just like the process for adding
+multiple audio tracks, to ensure proper archival, you may specify additional
+files in a specific format. They will be encoded into the final MKV. They must
+follow a strict syntax:
+```
+gameplay.avi
+gameplay st0 (TRACK_NAME).txt
+gameplay st1 (TRACK_NAME).txt
+gameplay st2 (TRACK_NAME).txt
+```
+It's the same as the audio, except replacing `wav` with `txt`.
+
+These subtitle files are label files exported via
+[Audacity](https://www.audacityteam.org/) which contain proper `start`,
+`finish`, and `text` data needed to generate SRT subtitles. An example of this
+would be:
+```
+0.325079	1.102948	This is a test
+1.857596	2.821224	This is also a test lol
+```
+It's a very simple format. Data is separated by tabs (`\t`) and newlines
+(`\n`). Generating an SRT subtitle file from this is done easily via
+`tools/txt2srt.cpp`.
+
+If multiple subtitle files are present, an additional subtitle track will be
+generated, `Voice - All`, which combines all other `txt` files together in a
+non-conflicting way. This track will be the first subtitle track in the final
+MKV file.
+
 ## Additional Metadata
 MKV files allow for `DATE_ENCODED` and `DATE_RECORDED` tags. `hdr_render.sh`
 will grab this metadata with nanosecond precision to store in the file. It's
