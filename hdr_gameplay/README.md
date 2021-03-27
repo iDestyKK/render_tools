@@ -97,10 +97,32 @@ It's a very simple format. Data is separated by tabs (`\t`) and newlines
 (`\n`). Generating an SRT subtitle file from this is done easily via
 `tools/txt2srt.cpp`.
 
+### Additional "All in one" track
+
 If multiple subtitle files are present, an additional subtitle track will be
 generated, `Voice - All`, which combines all other `txt` files together in a
 non-conflicting way. This track will be the first subtitle track in the final
 MKV file.
+
+### Preservation of the original files
+
+Finally, a `subtitles_txt.tar.xz` will be generated and embedded into the final
+MKV file. This archive will contain the original `txt` files exported from
+Audacity. The reason for the archival of these files is because the precision
+of the timestamps stored in them is far greater than the precision of the
+`srt` files generated from them. In addition, the original filenames and
+metadata are preserved because that's just how `tar` works.
+
+An FFmpeg output for an MKV file containing such an attachment would look like
+this:
+
+```
+  Stream #0:22: Attachment: none
+    Metadata:
+      filename        : subtitle_txt.tar.xz
+      mimetype        : application/x-gtar
+      title           : Subtitle Raws (Audacity Labels)
+```
 
 ## Additional Metadata
 MKV files allow for `DATE_ENCODED` and `DATE_RECORDED` tags. `hdr_render.sh`
