@@ -348,7 +348,7 @@ function render {
 			j=$l
 
 			# Create a TAR archive of the raw Audacity label files
-			eval "tar --transform 's/.*\///g' -cJvf \"${PR}/subtitle_txt.tar.xz\" ${cstr}"
+			eval "tar --transform 's/.*\///g' -cJf \"${PR}/subtitle_txt.tar.xz\" ${cstr}"
 
 			# Add that into the metadata and include statements
 			cmd="${cmd} -attach \"${PR}/subtitle_txt.tar.xz\""
