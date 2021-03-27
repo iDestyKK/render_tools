@@ -19,11 +19,23 @@
 # 1. Setup                                                                 {{{1
 # -----------------------------------------------------------------------------
 
+# Colours
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+normal=$(tput sgr 0)
+
 # Where are we?
 SCRIPT=$(readlink -f "$0")
 SPATH=$(dirname "$SCRIPT")
 UTIL="${SPATH}/../util"
 PR="${SPATH}/processed"
+TDIR="${SPATH}/tools/bin/$OSTYPE"
+
+# Video Language Metadata (ISO 639-2)
+GV_LANG="jpn" # Game Video Language
+GA_LANG="jpn" # Game Audio Language
+VC_LANG="eng" # Voice Chat Language
 
 # -----------------------------------------------------------------------------
 # 2. Construct HDR x265 param string                                       {{{1
@@ -79,16 +91,29 @@ function render {
 	DATE_ENC=$(gettime_mkv)
 
 	# Detect a 16 channel audio file and process accordingly if so
-	SRAW="${F/.avi/ (16ch).wav}"
+	SRAW="${F/.avi/ (16ch).tta}"
+	WRAW="${F/.avi/ (16ch).wav}"
+
+	# Handle the generation of the temporary compressed 16 channel file
 	if [ -e "$SRAW" ]; then
+		# Simply copy the file over. It's already compressed.
+		cp "$SRAW" "${PR}/__AUDIO_tmp_16ch.tta"
+	elif [ -e "$WRAW" ]; then
 		# Generate 16-channel TTA (True Audio) track.
 		ffmpeg \
-			-i "$SRAW" \
+			-i "$WRAW" \
 			-c:a tta   \
 			"${PR}/__AUDIO_tmp_16ch.tta"
+	fi
 
-		# Render with a 7.1 track generated instead. This mix is generated from
-		# the 16 channels being "flattened" into 8 via:
+	# Encode video
+	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+		#
+		# A 16 channel (7.1.4.4) audio track was provided. Ensure that the
+		# first track is a 7.1 track via generating it from the 16 channel
+		# audio. A 7.1 mix can be generated via "flattening" the original mix
+		# into 8 channels via:
+		#
 		#     FL  = FL + (TFL / 2) + (BFL / 2)
 		#     FR  = FR + (TFR / 2) + (BFR / 2)
 		#     FC  = FC + (TFL / 4) + (TFR / 4) + (BFL / 4) + (BFR / 4)
@@ -97,6 +122,7 @@ function render {
 		#     BR  = BR + (TBR / 2) + (BBR / 2)
 		#     SL  = SL + (TBL / 2) + (BBL / 2) + (TFL / 4) + (BFL / 4)
 		#     SR  = SR + (TBR / 2) + (BBR / 2) + (TFR / 4) + (BFR / 4)
+		#
 
 		C0="c0=c0 + 0.5 * c8 + 0.5 * c12"
 		C1="c1=c1 + 0.5 * c9 + 0.5 * c13"
@@ -111,7 +137,7 @@ function render {
 
 		ffmpeg \
 			-i "${F}"                                                         \
-			-i "$SRAW"                                                        \
+			-i "${PR}/__AUDIO_tmp_16ch.tta"                                   \
 			-pix_fmt yuv420p10le                                              \
 			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
 			-filter_complex "[1:a]pan=7.1|$CH_MAP[a]" \
@@ -124,10 +150,18 @@ function render {
 			-map 0:v                                                          \
 			-map "[a]"                                                        \
 			-metadata:s:a:0 title="Game Audio [7.1 Surround]"                 \
+			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 title="Game Video"                                \
+			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
 	else
+		#
+		# No 16 channel audio was provided. So just encode with whatever is in
+		# the first audio track.
+		#
+
 		ffmpeg \
 			-i "${F}"                                                         \
 			-pix_fmt yuv420p10le                                              \
@@ -141,6 +175,9 @@ function render {
 			-map 0:v                                                          \
 			-map 0:1                                                          \
 			-metadata:s:a:0 title="Game Audio"                                \
+			-metadata:s:a:0 language="${GA_LANG}"                             \
+			-metadata:s:v:0 title="Game Video"                                \
+			-metadata:s:v:0 language="${GV_LANG}"                             \
 			-metadata DATE_RECORDED="${DATE_REC}"                             \
 			-metadata DATE_ENCODED="${DATE_ENC}"                              \
 			"${PR}/__RENDER.mkv"
@@ -162,9 +199,12 @@ function render {
 			"16 Channel Master"
 
 		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
+
 		let "j++"
+
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"Game Audio [7.1.4.4 Master]\""
+		metadata="${metadata} -metadata:s:a:${j} language=\"${GA_LANG}\""
 	fi
 
 	while [ -e "${F/.avi/} st${i} ("*").wav" ]; do
@@ -191,16 +231,136 @@ function render {
 			"${PR}/__AUDIO_tmp${i}.flac"
 
 		cmd="${cmd} -i \"${PR}/__AUDIO_tmp${i}.flac\""
+
 		let "i++"
 		let "j++"
+
 		map="${map} -map ${j}:a"
 		metadata="${metadata} -metadata:s:a:${j} title=\"${title}\""
+		metadata="${metadata} -metadata:s:a:${j} language=\"${VC_LANG}\""
 	done
+
+	#
+	# If there are any Audacity TXT files, convert them to SRT and process...
+	# but only if txt2srt exists in the "tools/$OSTYPE/" directory.
+	#
+
+	if [ -e "${TDIR}/txt2srt" ]; then
+		k=0
+		l=$j
+		m=0
+		snum=0
+		cstr=""
+		ffps=""
+
+		#
+		# This is done in 2 phases. First up, combine all subtitles together.
+		# The txt2srt executable supports combining multiple TXT sources into a
+		# single SRT file with events properly ordered.
+		#
+
+		while [ -e "${F/.avi/} st${k} ("*").txt" ]; do
+			# Grab the title of the audio track from the ()'s
+			title=$(\
+				  ls "${F/.avi/} st${k} ("*").txt" \
+				| sed -e 's/.*(\(.*\)).*$/\1/'
+			)
+
+			printf \
+				"[%s]     %s Found Subtitle Track: %s\n" \
+				"$(gettime)"                                     \
+				"[${yellow}EXTRA${normal}]"                      \
+				"$title"
+
+			cstr="${cstr} \"$(echo "${F/.avi/} st${k} ("*").txt")\""
+
+			${TDIR}/txt2srt "${F/.avi/} st${k} ("*").txt" \
+				> "${PR}/__SUBTITLE_tmp${k}.srt"
+
+			let "k++"
+			let "l++"
+		done
+
+		# Scanner finding nothing just means there aren't any subtitles... lol
+		if [ $k -gt 0 ]; then
+			snum=$k
+			m=0
+
+			# Only create a huge mixed SRT if more than one track exists.
+			if [ $k -gt 1 ]; then
+				printf \
+					"[%s]     %s Mixing all %d subtitle tracks into one\n" \
+					"$(gettime)"                                     \
+					"[${yellow}EXTRA${normal}]"                      \
+					"$snum"
+
+				# Generate the SRT that has everything
+				eval "${TDIR}/txt2srt ${cstr} > \"${PR}/__SUBTITLE_tmp_C.srt\""
+
+				k=0
+				l=$j
+				let "l++"
+
+				cmd="${cmd} -i \"${PR}/__SUBTITLE_tmp_C.srt\""
+				map="${map} -map ${l}:s"
+				metadata="${metadata} -metadata:s:s:${m} title=\"Voice - All\""
+				metadata="${metadata} -metadata:s:s:${m} language=\"${VC_LANG}\""
+
+				let "m++"
+			else
+				k=0
+				l=$j
+			fi
+
+			# Concatenated SRT generated. Now reset and do the real deal.
+			printf \
+				"[%s]     %s Converted TXT files to SRT files... %s" \
+				"$(gettime)"                                     \
+				"[${yellow}EXTRA${normal}]"                      \
+				"(0 of $snum)"
+
+			while [ -e "${F/.avi/} st${k} ("*").txt" ]; do
+				# Grab the title of the audio track from the ()'s
+				title=$(\
+					  ls "${F/.avi/} st${k} ("*").txt" \
+					| sed -e 's/.*(\(.*\)).*$/\1/'
+				)
+
+				let "l++"
+
+				cmd="${cmd} -i \"${PR}/__SUBTITLE_tmp${k}.srt\""
+				map="${map} -map ${l}:s"
+				metadata="${metadata} -metadata:s:s:${m} title=\"${title}\""
+				metadata="${metadata} -metadata:s:s:${m} language=\"${VC_LANG}\""
+
+				let "k++"
+				let "m++"
+
+				printf \
+					"\r[%s]     %s Converted TXT files to SRT files... %s" \
+					"$(gettime)"                                     \
+					"[${yellow}EXTRA${normal}]"                      \
+					"($k of $snum)"
+			done
+
+			printf "\n"
+
+			j=$l
+
+			# Create a TAR archive of the raw Audacity label files
+			eval "tar --transform 's/.*\///g' -cJf \"${PR}/subtitle_txt.tar.xz\" ${cstr}"
+
+			# Add that into the metadata and include statements
+			cmd="${cmd} -attach \"${PR}/subtitle_txt.tar.xz\""
+			metadata="${metadata} -metadata:s:t:0 title=\"Subtitle Raws (Audacity Labels)\""
+			metadata="${metadata} -metadata:s:t:0 mimetype=\"application/x-gtar\""
+		fi
+	fi
 
 	# Append to the original file by making a copy, then overwriting
 	if [ $j -gt 0 ]; then
 		printf \
-			"[%s]     %s Muxing Extra Audio Tracks...\n" \
+			"[%s]     %s Muxing Extra Tracks...\n" \
 			"$(gettime)"                                 \
 			"[${yellow}EXTRA${normal}]"
 
@@ -208,13 +368,22 @@ function render {
 		# Run FFMPEG
 		eval "ffmpeg -hide_banner -v quiet -stats -i \"${PR}/__RENDER.mkv\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${PR}/tmp.mkv\""
 
-		# Cleanup and Overwrite
-		rm -f "${PR}/__AUDIO_tmp"*".flac" "${PR}/__AUDIO_tmp_16ch.tta"
+		# Cleanup
+		rm -f \
+			"${PR}/__AUDIO_tmp"*".flac" \
+			"${PR}/__AUDIO_tmp_16ch.tta" \
+			"${PR}/__SUBTITLE_tmp"*".srt" \
+			"${PR}/subtitle_txt.tar.xz"
+
+		# Overwrite
 		mv \
 			"${PR}/tmp.mkv" \
 			"${PR}/__RENDER.mkv"
+
 		echo ""
 	fi
+
+	# Final Copy
 	mv "${PR}/__RENDER.mkv" "${PR}/${MKV_F}"
 }
 

@@ -72,6 +72,58 @@ Modern Warfare supports this as well. If it does, expect an update to switch
 **TTA (True Audio)** to **WV (WavPack)** for 17 channel support as a
 `SPEAKER_BACK_CENTRE` would be nice...
 
+## Subtitle Tracks
+MKV allows for subtitle tracks as well. Just like the process for adding
+multiple audio tracks, to ensure proper archival, you may specify additional
+files in a specific format. They will be encoded into the final MKV. They must
+follow a strict syntax:
+```
+gameplay.avi
+gameplay st0 (TRACK_NAME).txt
+gameplay st1 (TRACK_NAME).txt
+gameplay st2 (TRACK_NAME).txt
+```
+It's the same as the audio, except replacing `wav` with `txt`.
+
+These subtitle files are label files exported via
+[Audacity](https://www.audacityteam.org/) which contain proper `start`,
+`finish`, and `text` data needed to generate SRT subtitles. An example of this
+would be:
+```
+0.325079	1.102948	This is a test
+1.857596	2.821224	This is also a test lol
+```
+It's a very simple format. Data is separated by tabs (`\t`) and newlines
+(`\n`). Generating an SRT subtitle file from this is done easily via
+`tools/txt2srt.cpp`.
+
+### Additional "All-in-one" track
+
+If multiple subtitle files are present, an additional subtitle track will be
+generated, `Voice - All`, which combines all other `txt` files together in a
+non-conflicting way. This track will be the first subtitle track in the final
+MKV file.
+
+### Preservation of the original files
+
+Finally, a `subtitles_txt.tar.xz` will be generated and embedded into the final
+MKV file. This archive will contain the original `txt` files exported from
+Audacity. The reason for the archival of these files is because the precision
+of the timestamps stored in them is far greater than the precision of the
+`srt` files generated from them. In addition, the original filenames and
+metadata are preserved because that's just how `tar` works.
+
+An FFmpeg output for an MKV file containing such an attachment would look like
+this:
+
+```
+  Stream #0:22: Attachment: none
+    Metadata:
+      filename        : subtitle_txt.tar.xz
+      mimetype        : application/x-gtar
+      title           : Subtitle Raws (Audacity Labels)
+```
+
 ## Additional Metadata
 MKV files allow for `DATE_ENCODED` and `DATE_RECORDED` tags. `hdr_render.sh`
 will grab this metadata with nanosecond precision to store in the file. It's
