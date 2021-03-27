@@ -19,11 +19,18 @@
 # 1. Setup                                                                 {{{1
 # -----------------------------------------------------------------------------
 
+# Colours
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+normal=$(tput sgr 0)
+
 # Where are we?
 SCRIPT=$(readlink -f "$0")
 SPATH=$(dirname "$SCRIPT")
 UTIL="${SPATH}/../util"
 PR="${SPATH}/processed"
+TDIR="${SPATH}/tools/bin/$OSTYPE"
 
 # Video Language Metadata (ISO 639-2)
 GV_LANG="jpn" # Game Video Language
@@ -233,10 +240,123 @@ function render {
 		metadata="${metadata} -metadata:s:a:${j} language=\"${VC_LANG}\""
 	done
 
+	#
+	# If there are any Audacity TXT files, convert them to SRT and process...
+	# but only if txt2srt exists in the "tools/$OSTYPE/" directory.
+	#
+
+	if [ -e "${TDIR}/txt2srt" ]; then
+		k=0
+		l=$j
+		m=0
+		snum=0
+		cstr=""
+		ffps=""
+
+		#
+		# This is done in 2 phases. First up, combine all subtitles together.
+		# The txt2srt executable supports combining multiple TXT sources into a
+		# single SRT file with events properly ordered.
+		#
+
+		while [ -e "${F/.avi/} st${k} ("*").txt" ]; do
+			# Grab the title of the audio track from the ()'s
+			title=$(\
+				  ls "${F/.avi/} st${k} ("*").txt" \
+				| sed -e 's/.*(\(.*\)).*$/\1/'
+			)
+
+			printf \
+				"[%s]     %s Found Subtitle Track: %s\n" \
+				"$(gettime)"                                     \
+				"[${yellow}EXTRA${normal}]"                      \
+				"$title"
+
+			cp "${F/.avi/} st${k} ("*").txt" "__SUBTITLE_tmp${k}.txt"
+			cstr="${cstr} \"__SUBTITLE_tmp${k}.txt\""
+
+			${TDIR}/txt2srt "__SUBTITLE_tmp${k}.txt" \
+				> "${PR}/__SUBTITLE_tmp${k}.srt"
+
+			let "k++"
+			let "l++"
+		done
+
+		# Scanner finding nothing just means there aren't any subtitles... lol
+		if [ $k -gt 0 ]; then
+			snum=$k
+			m=0
+
+			# Only create a huge mixed SRT if more than one track exists.
+			if [ $k -gt 1 ]; then
+				printf \
+					"[%s]     %s Mixing all %d subtitle tracks into one\n" \
+					"$(gettime)"                                     \
+					"[${yellow}EXTRA${normal}]"                      \
+					"$snum"
+
+				# Generate the SRT that has everything
+				eval "${TDIR}/txt2srt ${cstr} > \"${PR}/__SUBTITLE_tmp_C.srt\""
+
+				# Clean up
+				rm "__SUBTITLE_tmp"*".txt"
+
+				k=0
+				l=$j
+				let "l++"
+
+				cmd="${cmd} -i \"${PR}/__SUBTITLE_tmp_C.srt\""
+				map="${map} -map ${l}:s"
+				metadata="${metadata} -metadata:s:s:${m} title=\"Voice - All\""
+				metadata="${metadata} -metadata:s:s:${m} language=\"${VC_LANG}\""
+
+				let "m++"
+			else
+				k=0
+				l=$j
+			fi
+
+			# Concatenated SRT generated. Now reset and do the real deal.
+			printf \
+				"[%s]     %s Converted TXT files to SRT files... %s" \
+				"$(gettime)"                                     \
+				"[${yellow}EXTRA${normal}]"                      \
+				"(0 of $snum)"
+
+			while [ -e "${F/.avi/} st${k} ("*").txt" ]; do
+				# Grab the title of the audio track from the ()'s
+				title=$(\
+					  ls "${F/.avi/} st${k} ("*").txt" \
+					| sed -e 's/.*(\(.*\)).*$/\1/'
+				)
+
+				let "l++"
+
+				cmd="${cmd} -i \"${PR}/__SUBTITLE_tmp${k}.srt\""
+				map="${map} -map ${l}:s"
+				metadata="${metadata} -metadata:s:s:${m} title=\"${title}\""
+				metadata="${metadata} -metadata:s:s:${m} language=\"${VC_LANG}\""
+
+				let "k++"
+				let "m++"
+
+				printf \
+					"\r[%s]     %s Converted TXT files to SRT files... %s" \
+					"$(gettime)"                                     \
+					"[${yellow}EXTRA${normal}]"                      \
+					"($k of $snum)"
+			done
+
+			printf "\n"
+
+			j=$l
+		fi
+	fi
+
 	# Append to the original file by making a copy, then overwriting
 	if [ $j -gt 0 ]; then
 		printf \
-			"[%s]     %s Muxing Extra Audio Tracks...\n" \
+			"[%s]     %s Muxing Extra Tracks...\n" \
 			"$(gettime)"                                 \
 			"[${yellow}EXTRA${normal}]"
 
@@ -244,15 +364,21 @@ function render {
 		# Run FFMPEG
 		eval "ffmpeg -hide_banner -v quiet -stats -i \"${PR}/__RENDER.mkv\" ${cmd} -map 0:v -map 0:a ${map} ${metadata} -c copy \"${PR}/tmp.mkv\""
 
-		# Cleanup and Overwrite
-		rm -f "${PR}/__AUDIO_tmp"*".flac" "${PR}/__AUDIO_tmp_16ch.tta"
+		# Cleanup
+		rm -f \
+			"${PR}/__AUDIO_tmp"*".flac" \
+			"${PR}/__AUDIO_tmp_16ch.tta" \
+			"${PR}/__SUBTITLE_tmp"*".srt"
 
+		# Overwrite
 		mv \
 			"${PR}/tmp.mkv" \
 			"${PR}/__RENDER.mkv"
+
 		echo ""
 	fi
 
+	# Final Copy
 	mv "${PR}/__RENDER.mkv" "${PR}/${MKV_F}"
 }
 
