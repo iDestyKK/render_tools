@@ -37,6 +37,7 @@ printf "\t\"metadata\": {\n"
 printf \
 	"\t\t\"title\": {\n\t\t\t\"%s\": \"\",\n\t\t\t\"%s\": \"\"\n\t\t},\n" \
 	"en-gb" "ja-jp"
+printf "\t\t\"id\": \"\",\n"
 printf "\t\t\"rating\": -1,\n"
 printf "\t\t\"identifier\": [],\n"
 printf "\t\t\"comment\": \"\",\n"
