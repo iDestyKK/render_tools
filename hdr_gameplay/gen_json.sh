@@ -16,8 +16,8 @@ ffmpeg -i "$F" 2> tmp.txt
 # Grab metadata
 DATE_REC=$(grep "DATE_RECORDED" "tmp.txt" | sed 's/^.*: //')
 DATE_ENC=$(grep "DATE_ENCODED" "tmp.txt" | sed 's/^.*: //')
-TS_REC=$(date -d "$DATE_REC" +"%s")
-TS_ENC=$(date -d "$DATE_ENC" +"%s")
+TS_REC=$(date -d "$DATE_REC" +"%s%N")
+TS_ENC=$(date -d "$DATE_ENC" +"%s%N")
 DURATION="$(grep "^  Duration:" tmp.txt | sed 's/.*Duration: \(.*\), s.*/\1/')"
 SEC=$(
 	echo "$DURATION" \
