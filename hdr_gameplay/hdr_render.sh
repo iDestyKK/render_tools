@@ -138,8 +138,9 @@ function render {
 		ffmpeg \
 			-i "${F}"                                                         \
 			-i "${PR}/__AUDIO_tmp_16ch.tta"                                   \
+			-color_range pc                                                   \
 			-pix_fmt yuv420p10le                                              \
-			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
+			-vf scale=in_range=full:out_range=full:out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
 			-filter_complex "[1:a]pan=7.1|$CH_MAP[a]" \
 			-c:v libx265                                                      \
 			-preset medium                                                    \
@@ -164,8 +165,9 @@ function render {
 
 		ffmpeg \
 			-i "${F}"                                                         \
+			-color_range pc                                                   \
 			-pix_fmt yuv420p10le                                              \
-			-vf scale=out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
+			-vf scale=in_range=full:out_range=full:out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
 			-c:v libx265                                                      \
 			-preset medium                                                    \
 			-crf 16                                                           \
