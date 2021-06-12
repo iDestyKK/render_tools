@@ -37,6 +37,10 @@ GV_LANG="jpn" # Game Video Language
 GA_LANG="jpn" # Game Audio Language
 VC_LANG="eng" # Voice Chat Language
 
+# Figure out if wavpack is usable
+command -v wavpack > /dev/null
+WV_ABLE=$?
+
 # -----------------------------------------------------------------------------
 # 2. Construct HDR x265 param string                                       {{{1
 # -----------------------------------------------------------------------------
@@ -93,21 +97,36 @@ function render {
 	# Detect a 16 channel audio file and process accordingly if so
 	SRAW="${F/.avi/ (16ch).tta}"
 	WRAW="${F/.avi/ (16ch).wav}"
+	VRAW="${F/.avi/ (16ch).wv}"
 
 	# Handle the generation of the temporary compressed 16 channel file
-	if [ -e "$SRAW" ]; then
+	# We'll cheat and make it codec-agnostic via mka.
+	if [ -e "$VRAW" ]; then
+		ffmpeg -i "$VRAW" -c copy "${PR}/__AUDIO_tmp_16ch.mka"
+	elif [ -e "$SRAW" ]; then
 		# Simply copy the file over. It's already compressed.
 		cp "$SRAW" "${PR}/__AUDIO_tmp_16ch.tta"
+		ffmpeg -i "$SRAW" -c copy "${PR}/__AUDIO_tmp_16ch.mka"
 	elif [ -e "$WRAW" ]; then
-		# Generate 16-channel TTA (True Audio) track.
-		ffmpeg \
-			-i "$WRAW" \
-			-c:a tta   \
-			"${PR}/__AUDIO_tmp_16ch.tta"
+		if [ $WV_ABLE -eq 0 ]; then
+			# If we can utilise WavPack, do so. Better compression ratio.
+			wavpack -hhx6m "$WRAW" "${PR}/__AUDIO_tmp_16ch.wv"
+
+			ffmpeg \
+				-i "${PR}/__AUDIO_tmp_16ch.wv" \
+				-c copy \
+				"${PR}/__AUDIO_tmp_16ch.mka"
+
+			rm "${PR}/__AUDIO_tmp_16ch.wv"
+		else
+			# Resort to a TTA (True Audio) master instead. Slightly less
+			# compression.
+			ffmpeg -i "$WRAW" -c:a tta "${PR}/__AUDIO_tmp_16ch.mka"
+		fi
 	fi
 
 	# Encode video
-	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+	if [ -e "${PR}/__AUDIO_tmp_16ch.mka" ]; then
 		#
 		# A 16 channel (7.1.4.4) audio track was provided. Ensure that the
 		# first track is a 7.1 track via generating it from the 16 channel
@@ -135,13 +154,32 @@ function render {
 
 		CH_MAP="$C0|$C1|$C2|$C3|$C4|$C5|$C6|$C7"
 
+		# Generate a temporary 7.1 master file
+		ffmpeg \
+			-i "${PR}/__AUDIO_tmp_16ch.mka" \
+			-filter_complex "[0:a]pan=7.1|$CH_MAP[a]" \
+			-map "[a]" \
+			-c:a pcm_s24le \
+			"${PR}/__AUDIO_tmp_7.1ch.wav"
+
+		# Have FFmpeg take a look...
+		AMPLIFY_AMT=$(
+			ffmpeg \
+				-i "${PR}/__AUDIO_tmp_7.1ch.wav" \
+				-af "volumedetect" \
+				-f null NUL \
+				2>&1 \
+				| grep "max_volume" \
+				| sed 's/.*-\(.*\) dB/\1/'
+		)
+
 		ffmpeg \
 			-i "${F}"                                                         \
-			-i "${PR}/__AUDIO_tmp_16ch.tta"                                   \
+			-i "${PR}/__AUDIO_tmp_7.1ch.wav"                                  \
 			-color_range pc                                                   \
 			-pix_fmt yuv420p10le                                              \
 			-vf scale=in_range=full:out_range=full:out_color_matrix=bt2020:out_h_chr_pos=0:out_v_chr_pos=0,format=yuv420p10 \
-			-filter_complex "[1:a]pan=7.1|$CH_MAP[a]" \
+			-filter_complex "[1:a]volume=${AMPLIFY_AMT}dB[a]" \
 			-c:v libx265                                                      \
 			-preset medium                                                    \
 			-crf 16                                                           \
@@ -193,14 +231,14 @@ function render {
 	metadata=""
 
 	# If the 16 channel one was created, add that one in the mix after 7.1 mix
-	if [ -e "${PR}/__AUDIO_tmp_16ch.tta" ]; then
+	if [ -e "${PR}/__AUDIO_tmp_16ch.mka" ]; then
 		printf \
 			"[%s]     %s Found Additional Audio Track: %s\n" \
 			"$(gettime)"                                     \
 			"[${yellow}EXTRA${normal}]"                      \
 			"16 Channel Master"
 
-		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.tta\""
+		cmd="${cmd} -i \"${PR}/__AUDIO_tmp_16ch.mka\""
 
 		let "j++"
 
@@ -373,7 +411,8 @@ function render {
 		# Cleanup
 		rm -f \
 			"${PR}/__AUDIO_tmp"*".flac" \
-			"${PR}/__AUDIO_tmp_16ch.tta" \
+			"${PR}/__AUDIO_tmp_16ch.mka" \
+			"${PR}/__AUDIO_tmp_7.1ch.wav" \
 			"${PR}/__SUBTITLE_tmp"*".srt" \
 			"${PR}/subtitle_txt.tar.xz"
 
@@ -387,6 +426,11 @@ function render {
 
 	# Final Copy
 	mv "${PR}/__RENDER.mkv" "${PR}/${MKV_F}"
+
+	# Generate a JSON file.
+	"${SPATH}/gen_json.sh" "${PR}/${MKV_F}" \
+		| sed 's/"amplify": 0.0/"amplify": '$AMPLIFY_AMT'/' \
+		> "${PR}/${MKV_F/mkv/json}"
 }
 
 cd queue
