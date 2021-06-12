@@ -7,8 +7,9 @@ fi
 
 # Filenames
 F="$1"
+BASE="$(basename "$F")"
 JSON="${F/mkv/json}"
-MASTER="$(dirname "$F")/../queue/${F/mkv/avi}"
+MASTER="$(dirname "$F")/../queue/${BASE/mkv/avi}"
 
 # Get FFmpeg information about the file
 ffmpeg -i "$F" 2> tmp.txt
@@ -30,7 +31,7 @@ SEC=$(
 printf "{\n"
 
 # Filename
-printf "\t\"filename\": \"%s\",\n" "$F"
+printf "\t\"filename\": \"%s\",\n" "$BASE"
 
 # Metadata
 printf "\t\"metadata\": {\n"
