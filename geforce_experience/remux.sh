@@ -321,8 +321,39 @@ for F in *.mp4; do
 	MD="$MD -metadata DATE_ENCODED=\"$DATE_ENC\""
 	MD="$MD -disposition none"
 
+	# Generate initial MKV file
 	eval "ffmpeg $FFMPEG_PARAM $I_STR $FILT $MAP $CMP $VMD $AMD $MD \"$OUT\""
 
+	# Generate JSON file
+	$SCRIPTPATH/gen_json.sh "$OUT" \
+		| sed 's/"amplify": 0.0/"amplify": '$AMP'/' \
+		> "$PROC_DIR/info.json"
+
+	# Get JSON modification date
+	STAT_MOD=$(stat "$PROC_DIR/info.json" \
+		| grep "Modify: " \
+		| sed 's/.*: \(.*-.*-.*\) \(.*:.*:.*\..*\) \(.*\)\(..\)$/\1T\2\3:\4/'
+	)
+
+	mv "$OUT" "$PROC_DIR/__tmp.mkv"
+
+	# Generate final MKV file
+	ffmpeg \
+		-i "$PROC_DIR/__tmp.mkv" \
+		-attach "$PROC_DIR/info.json" \
+		-map 0:v \
+		-map 0:a \
+		-c copy \
+		-metadata:s:t:0 filename="info.json" \
+		-metadata:s:t:0 title="MKV Information" \
+		-metadata:s:t:0 mimetype="application/json" \
+		-metadata:s:t:0 LAST_MODIFIED="${STAT_MOD}" \
+		"$OUT"
+
 	# Clean up
-	rm -f "__AUDIO_tmp_7.1ch.wav" "__AUDIO_tmp_16ch.mka"
+	rm -f \
+		"__AUDIO_tmp_7.1ch.wav" \
+		"__AUDIO_tmp_16ch.mka" \
+		"$PROC_DIR/__tmp.mkv" \
+		"$PROC_DIR/info.json"
 done
