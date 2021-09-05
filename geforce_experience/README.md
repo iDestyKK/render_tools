@@ -49,6 +49,19 @@ gameplay st3 (TRACK_NAME).mp3
 It will compress `gameplay st1 (TRACK_NAME).wav` into `flac`. It will stream
 copy every other track to preserve their original states.
 
+### Extra (unedited) 16 Channel File
+GeForce Experience really sucks with audio. Sometimes it drops samples
+(often 480 per channel) and those have to be edited in post via Audacity. The
+original unedited file can be muxed into the MKV along with an edited version
+by supplying a `gameplay (16ch_full).raw` (or a `wv`, `tta`, `wav`, etc) as
+well as a `gameplay (16ch).raw`. It will store the full version named as
+`Game Audio [7.1.4.4 Master - Unedited]`. This is temporary. I plan to write
+a tool that will spit out the differences and store those instead in the
+future. Most of the data between `16ch` and `16ch_full` are the same.
+
+The plan is to not use something like `bsdiff`, because memory usage increases
+exponentially. A sparse DP approach will be taken.
+
 ## JSON file containing metadata
 After the initial remux step, `gen_json.sh` will be auto-run, generating a
 `info.json` file that contains all information about the MKV file. It will also

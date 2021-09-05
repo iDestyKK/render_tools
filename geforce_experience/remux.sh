@@ -245,6 +245,99 @@ for F in *.mp4; do
 	fi
 
 	#
+	# In the event that GeForce Experience drops audio while recording (which
+	# happens way more than I would like), a "16ch_full" variation of "16ch"
+	# will exist. Process this the same way as "16ch" but don't generate a
+	# compatible 7.1ch variation. This full original copy is only for
+	# preservation.
+	#
+	# Shameless C+P. I don't even care anymore. It's temporary.
+	#
+
+	if [ -e "$BF (16ch_full).wv" ]; then
+
+		# A pre-compressed WV has been delivered. Remux it.
+		ffmpeg -i "$BF (16ch_full).wv" -map 0:a -c copy "__AUDIO_tmp_16ch_full.mka"
+
+	elif [ -e "$BF (16ch_full).tta" ]; then
+
+		# A pre-compressed TTA has been delivered. Remux it.
+		ffmpeg -i "$BF (16ch_full).tta" -map 0:a -c copy "__AUDIO_tmp_16ch_full.mka"
+
+	elif [ -e "$BF (16ch_full).raw" ]; then
+
+		#
+		# A 16 channel RAW file has been delivered. Assume 48,000hz,
+		# 24 bit, 16 channels.
+		#
+
+		if [ $WV_ABLE -eq 0 ]; then
+			# We can use WavPack
+			wavpack \
+				$PARAM_FFMPEG --raw-pcm=48000,24s,16,le "$BF (16ch_full).raw"
+
+			# Remux into MKA container
+			ffmpeg \
+				-i "$BF (16ch_full).wv" \
+				-map 0:a \
+				-c copy \
+				"__AUDIO_tmp_16ch_full.mka"
+
+			# Clean up
+			rm -f "$BF (16ch_full).wv"
+		else
+			# We can't use WavPack. Instead, use TrueAudio (TTA) via FFmpeg
+			ffmpeg \
+				-f s24le -ar 48000 -ac 16 \
+				-i "$BF (16ch_full).raw" \
+				-map 0:a \
+				-c tta \
+				"__AUDIO_tmp_16ch_full.mka"
+		fi
+
+	elif [ -e "$BF (16ch_full).wav" ]; then
+
+		# A 16 channel WAV file has been delivered instead.
+		if [ $WV_ABLE -eq 0 ]; then
+			# We can use WavPack
+			wavpack $PARAM_FFMPEG "$BF (16ch_full).wav"
+
+			# Remux into MKA container
+			ffmpeg \
+				-i "$BF (16ch_full).wv" \
+				-map 0:a \
+				-c copy \
+				"__AUDIO_tmp_16ch_full.mka"
+
+			# Clean up
+			rm -f "$BF (16ch_full).wv"
+		else
+			# We can't use WavPack. Instead, use TrueAudio (TTA) via FFmpeg
+			ffmpeg \
+				-i "$BF (16ch_full).wav" \
+				-map 0:a \
+				-c tta \
+				"__AUDIO_tmp_16ch_full.mka"
+		fi
+
+	fi
+
+	if [ -e "__AUDIO_tmp_16ch_full.mka" ]; then
+		# 16ch_full information
+		I_STR="$I_STR -i __AUDIO_tmp_16ch_full.mka"
+		MAP="$MAP -map $FI:a:0"
+		CMP="$CMP -c:a:$AI copy"
+
+		AMD="$AMD -metadata:s:a:$AI title=\"Game Audio [7.1.4.4 Master -"
+		AMD="$AMD Unedited]\""
+
+		AMD="$AMD -metadata:s:a:$AI language=\"$GA_LANG\""
+
+		let "AI++"
+		let "FI++"
+	fi
+
+	#
 	# If no "stX (Game Audio).*" exists, and if no "(16ch).raw" or "(16ch).wv"
 	# exists, we have no choice but to use the file's audio track. The twist is
 	# that we want the input file to be format-agnostic. Not just "aac". It can
@@ -354,6 +447,7 @@ for F in *.mp4; do
 	rm -f \
 		"__AUDIO_tmp_7.1ch.wav" \
 		"__AUDIO_tmp_16ch.mka" \
+		"__AUDIO_tmp_16ch_full.mka" \
 		"$PROC_DIR/__tmp.mkv" \
 		"$PROC_DIR/info.json"
 done
