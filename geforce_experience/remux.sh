@@ -116,7 +116,7 @@ for F in *.mp4; do
 		if [ $WV_ABLE -eq 0 ]; then
 			# We can use WavPack
 			wavpack \
-				$PARAM_FFMPEG --raw-pcm=48000,24s,16,le "$BF (16ch).raw"
+				$PARAM_WAVPACK --raw-pcm=48000,24s,16,le "$BF (16ch).raw"
 
 			# Remux into MKA container
 			ffmpeg \
@@ -142,7 +142,7 @@ for F in *.mp4; do
 		# A 16 channel WAV file has been delivered instead.
 		if [ $WV_ABLE -eq 0 ]; then
 			# We can use WavPack
-			wavpack $PARAM_FFMPEG "$BF (16ch).wav"
+			wavpack $PARAM_WAVPACK "$BF (16ch).wav"
 
 			# Remux into MKA container
 			ffmpeg \
@@ -201,13 +201,14 @@ for F in *.mp4; do
 			-i "__AUDIO_tmp_16ch.mka" \
 			-filter_complex "[0:a]pan=7.1|$CH_MAP[a]" \
 			-map '[a]' \
-			-c:a pcm_s24le \
-			"__AUDIO_tmp_7.1ch.wav"
+			-c:a flac \
+			-compression_level 12 \
+			"__AUDIO_tmp_7.1ch.flac"
 
 		# Have FFmpeg take a look at the amplification needed to make it LOUD
 		AMP=$(
 			ffmpeg \
-				-i "__AUDIO_tmp_7.1ch.wav" \
+				-i "__AUDIO_tmp_7.1ch.flac" \
 				-af "volumedetect" \
 				-f null NUL \
 				2>&1 \
@@ -221,7 +222,7 @@ for F in *.mp4; do
 		#
 
 		# 7.1ch information
-		I_STR="$I_STR -i __AUDIO_tmp_7.1ch.wav"
+		I_STR="$I_STR -i __AUDIO_tmp_7.1ch.flac"
 		FILT="-filter_complex \"[$FI:a:0]volume=${AMP}dB[amped]\""
 		MAP="$MAP -map \"[amped]\""
 		CMP="$CMP -c:a:$AI flac -compression_level 12"
@@ -274,7 +275,7 @@ for F in *.mp4; do
 		if [ $WV_ABLE -eq 0 ]; then
 			# We can use WavPack
 			wavpack \
-				$PARAM_FFMPEG --raw-pcm=48000,24s,16,le "$BF (16ch_full).raw"
+				$PARAM_WAVPACK --raw-pcm=48000,24s,16,le "$BF (16ch_full).raw"
 
 			# Remux into MKA container
 			ffmpeg \
@@ -300,7 +301,7 @@ for F in *.mp4; do
 		# A 16 channel WAV file has been delivered instead.
 		if [ $WV_ABLE -eq 0 ]; then
 			# We can use WavPack
-			wavpack $PARAM_FFMPEG "$BF (16ch_full).wav"
+			wavpack $PARAM_WAVPACK "$BF (16ch_full).wav"
 
 			# Remux into MKA container
 			ffmpeg \
@@ -445,7 +446,7 @@ for F in *.mp4; do
 
 	# Clean up
 	rm -f \
-		"__AUDIO_tmp_7.1ch.wav" \
+		"__AUDIO_tmp_7.1ch.flac" \
 		"__AUDIO_tmp_16ch.mka" \
 		"__AUDIO_tmp_16ch_full.mka" \
 		"$PROC_DIR/__tmp.mkv" \
