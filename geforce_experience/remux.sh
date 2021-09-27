@@ -73,6 +73,7 @@ for F in *.mp4; do
 	MD=""    # Misc Metadata (unrelated to streams)
 	MAP=""   # Mapping Information
 	AMP=0    # Amplification Amount
+	G_SRD=1  # Generate 7.1ch from 16ch
 	FILT=""  # FFmpeg "filter_complex", if needed
 
 	# The Video File is obviously the video stream
@@ -86,6 +87,89 @@ for F in *.mp4; do
 
 	let "VI++"
 	let "FI++"
+
+	#
+	# If a "(7.1ch).flac" exists, re-compress and use it as the primary audio
+	# track for the final MKV file. If this file exists, we do not need to
+	# generate a 7.1ch master from a 16ch file later on.
+	#
+	# It can be a FLAC here, instead of WV, TTA, RAW, etc, as FLAC supports 8
+	# channels.
+	#
+
+	if [ -e "$BF (7.1ch).flac" ]; then
+		ffmpeg \
+			-i "$BF (7.1ch).flac" \
+			-map 0:a:0 \
+			-c:a flac \
+			-compression_level 12 \
+			"__AUDIO_tmp_7.1ch.flac"
+
+		# Have FFmpeg take a look at the amplification needed to make it LOUD
+		AMP=$(
+			ffmpeg \
+				-i "__AUDIO_tmp_7.1ch.flac" \
+				-af "volumedetect" \
+				-f null NUL \
+				2>&1 \
+				| grep "max_volume" \
+				| sed 's/.*max_volume: -\?\(.*\) dB/\1/'
+		)
+
+		#
+		# Go on and add the input and metadata information necessary.
+		#
+
+		# 7.1ch information
+		I_STR="$I_STR -i __AUDIO_tmp_7.1ch.flac"
+		FILT="-filter_complex \"[$FI:a:0]volume=${AMP}dB[amped]\""
+		MAP="$MAP -map \"[amped]\""
+		CMP="$CMP -c:a:$AI flac -compression_level 12"
+
+		AMD="$AMD -metadata:s:a:$AI title=\"Game Audio [7.1 Surround]\""
+		AMD="$AMD -metadata:s:a:$AI language=\"$GA_LANG\""
+
+		let "AI++"
+		let "FI++"
+
+		# Tell future steps not to generate a 7.1 master
+		G_SND=0
+	fi
+
+	#
+	# In the event that GeForce Experience drops audio while recording (which
+	# happens way more than I would like), a "7.1ch_full" variation of "7.1ch"
+	# will exist. Process this the same way as "7.1ch" but don't compute
+	# amplification information. This full original copy is only for
+	# preservation.
+	#
+	# Shameless C+P. I don't even care anymore. It's temporary.
+	#
+
+	if [ -e "$BF (7.1ch_full).flac" ]; then
+		ffmpeg \
+			-i "$BF (7.1ch_full).flac" \
+			-map 0:a:0 \
+			-c:a flac \
+			-compression_level 12 \
+			"__AUDIO_tmp_7.1ch_full.flac"
+
+		#
+		# Go on and add the input and metadata information necessary.
+		#
+
+		# 7.1ch_full information
+		I_STR="$I_STR -i __AUDIO_tmp_7.1ch_full.flac"
+		MAP="$MAP -map $FI:a:0"
+		CMP="$CMP -c:a:$AI flac -compression_level 12"
+
+		AMD="$AMD -metadata:s:a:$AI title=\"Game Audio [7.1 Surround -"
+		AMD="$AMD Unedited]\""
+		AMD="$AMD -metadata:s:a:$AI language=\"$GA_LANG\""
+
+		let "AI++"
+		let "FI++"
+	fi
 
 	#
 	# If a "(16ch).raw" or "(16ch).wav" file exists. Compress it via WavPack
@@ -169,7 +253,7 @@ for F in *.mp4; do
 	# above. If so, generate a 7.1 Surround Sound track from it.
 	#
 
-	if [ -e "__AUDIO_tmp_16ch.mka" ]; then
+	if [ $G_SND -eq 1 ] && [ -e "__AUDIO_tmp_16ch.mka" ]; then
 		#
 		# A 16 channel (7.1.4.4) audio track was provided. Ensure that the
 		# first track is a 7.1 track via generating it from the 16 channel
@@ -404,10 +488,19 @@ for F in *.mp4; do
 	done
 
 	# Get file creation timestamp
-	DATE_REC=$(stat "$F" \
-		| grep "Birth: " \
-		| sed 's/.*: \(.*-.*-.*\) \(.*:.*:.*\..*\) \(.*\)\(..\)$/\1T\2\3:\4/'
-	)
+	fgrep "$BF" "${QUEUE_DIR}/ts.csv" > /dev/null 2> /dev/null
+	TMP=$?
+
+	if [ $TMP -eq 0 ]; then
+		# Get it from a timestamp file
+		DATE_REC=$(fgrep "$BF" "${QUEUE_DIR}/ts.csv" | sed 's/.*,//')
+	else
+		# Get it directly from the file
+		DATE_REC=$(stat "$F" \
+		  | grep "Birth: " \
+		  | sed 's/.*: \(.*-.*-.*\) \(.*:.*:.*\..*\) \(.*\)\(..\)$/\1T\2\3:\4/'
+		)
+	fi
 
 	DATE_ENC=$(date +%Y-%m-%dT%H:%M:%S.%N%:z)
 
@@ -447,6 +540,7 @@ for F in *.mp4; do
 	# Clean up
 	rm -f \
 		"__AUDIO_tmp_7.1ch.flac" \
+		"__AUDIO_tmp_7.1ch_full.flac" \
 		"__AUDIO_tmp_16ch.mka" \
 		"__AUDIO_tmp_16ch_full.mka" \
 		"$PROC_DIR/__tmp.mkv" \
