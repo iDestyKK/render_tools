@@ -133,7 +133,7 @@ for F in *.mp4; do
 		let "FI++"
 
 		# Tell future steps not to generate a 7.1 master
-		G_SND=0
+		G_SRD=0
 	fi
 
 	#
@@ -253,7 +253,7 @@ for F in *.mp4; do
 	# above. If so, generate a 7.1 Surround Sound track from it.
 	#
 
-	if [ $G_SND -eq 1 ] && [ -e "__AUDIO_tmp_16ch.mka" ]; then
+	if [ $G_SRD -eq 1 ] && [ -e "__AUDIO_tmp_16ch.mka" ]; then
 		#
 		# A 16 channel (7.1.4.4) audio track was provided. Ensure that the
 		# first track is a 7.1 track via generating it from the 16 channel
