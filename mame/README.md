@@ -80,4 +80,4 @@ file as an example:
 
 Storing the ROM name allows playing back the file without the user having to
 specify the ROM name manually. The timestamps allow for better
-synchronisation between `stems.mka` and an exported
+synchronisation between `stems.mka` and an exported AVI file's audio stream.
