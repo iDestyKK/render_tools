@@ -19,6 +19,30 @@ To run a ROM, instead of doing `mame ROM_NAME`, do
 `./run_rom_w_mic.sh ROM_NAME`. It will record and then generate a TAR.XZ file
 containing the recorded inputs, as well as some additional information.
 
+To be clear, the usage is:
+
+```
+UNIX> ./run_rom_w_mic.sh ROM_NAME
+```
+
+## Generating a YouTube-ready Deliverable MKV
+
+Assuming you have a `tar.xz` file recorded via `run_rom_w_mic.sh`, you are able
+to generate a YouTube-ready deliverable MKV file by running `mame_to_vid.sh`.
+This script simply takes one argument, the TAR.XZ file. Assuming MAME is
+properly configured, it will generate an AVI file, and then process that AVI to
+MKV via `ffmpeg`.
+
+To be clear, the usage is:
+
+```
+UNIX> ./mame_to_vid.sh INPUT.tar.xz
+```
+
+Assuming a tar.xz file `[2024-11-01 - 16 48 34] area88.tar.xz`, a
+`[2024-11-01 - 16 48 34] area88.mkv` will be generated with a height of 2160p.
+The video can be uploaded to YouTube and will have 4K resolution available.
+
 ## Session Recording Information
 
 After playing a session, a TAR.XZ file is created that contains some files. The
