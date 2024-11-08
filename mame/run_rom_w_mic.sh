@@ -36,7 +36,7 @@ touch stop
 	-metadata:s:a:1 title="$TRK_1" \
 	"tmp.mka" &
 
-mame "$1" -record inputs.inp
+mame "$1" -record inputs.inp -skip_gameinfo
 
 echo "q" > stop
 

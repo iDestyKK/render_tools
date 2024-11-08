@@ -34,7 +34,14 @@ mv inputs.inp "$INP_DIR/__tmp.inp"
 
 # Run MAME
 cd "$MAME_DIR"
-mame "$ROM" -playback "__tmp.inp" -exit_after_playback -aviwrite __tmp
+
+mame \
+	"$ROM"                \
+	-playback "__tmp.inp" \
+	-exit_after_playback  \
+	-skip_gameinfo        \
+	-aviwrite __tmp
+
 rm "$INP_DIR/__inp.inp"
 
 # Go back
